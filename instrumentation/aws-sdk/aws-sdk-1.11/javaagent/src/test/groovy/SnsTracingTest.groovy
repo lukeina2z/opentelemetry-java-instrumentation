@@ -132,6 +132,7 @@ class SnsTracingTest extends AgentInstrumentationSpecification {
             "$ServerAttributes.SERVER_ADDRESS" String
             "$NetworkAttributes.NETWORK_PROTOCOL_VERSION" "1.1"
             "$ServerAttributes.SERVER_PORT" { it == null || Number }
+            "aws.sns.topic.arn" "$topicArn"
           }
         }
       }
@@ -155,6 +156,7 @@ class SnsTracingTest extends AgentInstrumentationSpecification {
             "$NetworkAttributes.NETWORK_PROTOCOL_VERSION" "1.1"
             "$ServerAttributes.SERVER_PORT" { it == null || Number }
             "$MessagingIncubatingAttributes.MESSAGING_DESTINATION_NAME" topicArn
+            "aws.sns.topic.arn" "$topicArn"
           }
         }
       }
@@ -177,6 +179,7 @@ class SnsTracingTest extends AgentInstrumentationSpecification {
             "$NetworkAttributes.NETWORK_PROTOCOL_VERSION" "1.1"
             "$ServerAttributes.SERVER_PORT" { it == null || Number }
             "$MessagingIncubatingAttributes.MESSAGING_DESTINATION_NAME" topicArn
+            "aws.sns.topic.arn" "$topicArn"
           }
         }
         span(1) {
