@@ -94,7 +94,8 @@ class AwsSpanAssertions {
             equalTo(NETWORK_PROTOCOL_VERSION, "1.1"),
             equalTo(RPC_SYSTEM, "aws-api"),
             satisfies(RPC_METHOD, stringAssert -> stringAssert.isEqualTo(rpcMethod)),
-            equalTo(RPC_SERVICE, "AmazonSQS")));
+            equalTo(RPC_SERVICE, "AmazonSQS"),
+            equalTo(stringKey("aws.auth.account.access_key"), "x")));
 
     if (spanName.endsWith("receive")
         || spanName.endsWith("process")

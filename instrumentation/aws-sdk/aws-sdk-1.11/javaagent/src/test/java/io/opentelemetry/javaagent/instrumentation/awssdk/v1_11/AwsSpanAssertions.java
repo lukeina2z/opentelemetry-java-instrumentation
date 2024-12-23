@@ -37,6 +37,7 @@ class AwsSpanAssertions {
             satisfies(stringKey("aws.endpoint"), v -> v.isInstanceOf(String.class)),
             equalTo(stringKey("aws.queue.name"), queueName),
             equalTo(stringKey("aws.queue.url"), queueUrl),
+            equalTo(stringKey("aws.auth.account.access_key"), "test"),
             satisfies(AWS_REQUEST_ID, v -> v.isInstanceOf(String.class)),
             equalTo(RPC_METHOD, rpcMethod),
             equalTo(RPC_SYSTEM, "aws-api"),
@@ -71,6 +72,7 @@ class AwsSpanAssertions {
             equalTo(RPC_METHOD, rpcMethod),
             equalTo(RPC_SYSTEM, "aws-api"),
             equalTo(RPC_SERVICE, "Amazon S3"),
+            equalTo(stringKey("aws.auth.account.access_key"), "test"),
             equalTo(HTTP_REQUEST_METHOD, requestMethod),
             equalTo(HTTP_RESPONSE_STATUS_CODE, responseStatusCode),
             satisfies(URL_FULL, val -> val.startsWith("http://")),
@@ -85,28 +87,52 @@ class AwsSpanAssertions {
   }
 
   static SpanDataAssert sns(SpanDataAssert span, String topicArn, String rpcMethod) {
+    SpanDataAssert spanAssert =
+        span.hasName("SNS." + rpcMethod).hasKind(SpanKind.CLIENT).hasNoParent();
 
-    return span.hasName("SNS." + rpcMethod)
-        .hasKind(SpanKind.CLIENT)
-        .hasNoParent()
-        .hasAttributesSatisfyingExactly(
-            equalTo(stringKey("aws.agent"), "java-aws-sdk"),
-            equalTo(MESSAGING_DESTINATION_NAME, topicArn),
-            satisfies(stringKey("aws.endpoint"), v -> v.isInstanceOf(String.class)),
-            satisfies(AWS_REQUEST_ID, v -> v.isInstanceOf(String.class)),
-            equalTo(RPC_METHOD, rpcMethod),
-            equalTo(RPC_SYSTEM, "aws-api"),
-            equalTo(RPC_SERVICE, "AmazonSNS"),
-            equalTo(HTTP_REQUEST_METHOD, "POST"),
-            equalTo(HTTP_RESPONSE_STATUS_CODE, 200),
-            satisfies(URL_FULL, val -> val.startsWith("http://")),
-            satisfies(SERVER_ADDRESS, v -> v.isInstanceOf(String.class)),
-            equalTo(NETWORK_PROTOCOL_VERSION, "1.1"),
-            satisfies(
-                SERVER_PORT,
-                val ->
-                    val.satisfiesAnyOf(
-                        v -> assertThat(v).isNull(),
-                        v -> assertThat(v).isInstanceOf(Number.class))));
+    // For CreateTopic, the topicArn parameter might be null but aws.sns.topic.arn
+    // will be set from the response
+    if ("CreateTopic".equals(rpcMethod)) {
+      return spanAssert.hasAttributesSatisfyingExactly(
+          equalTo(stringKey("aws.agent"), "java-aws-sdk"),
+          satisfies(stringKey("aws.endpoint"), v -> v.isInstanceOf(String.class)),
+          satisfies(AWS_REQUEST_ID, v -> v.isInstanceOf(String.class)),
+          equalTo(RPC_METHOD, rpcMethod),
+          equalTo(RPC_SYSTEM, "aws-api"),
+          equalTo(RPC_SERVICE, "AmazonSNS"),
+          equalTo(stringKey("aws.auth.account.access_key"), "test"),
+          equalTo(HTTP_REQUEST_METHOD, "POST"),
+          equalTo(HTTP_RESPONSE_STATUS_CODE, 200),
+          satisfies(URL_FULL, val -> val.startsWith("http://")),
+          satisfies(SERVER_ADDRESS, v -> v.isInstanceOf(String.class)),
+          equalTo(NETWORK_PROTOCOL_VERSION, "1.1"),
+          satisfies(
+              SERVER_PORT,
+              val ->
+                  val.satisfiesAnyOf(
+                      v -> assertThat(v).isNull(), v -> assertThat(v).isInstanceOf(Number.class))),
+          satisfies(stringKey("aws.sns.topic.arn"), v -> v.isInstanceOf(String.class)));
+    }
+
+    return spanAssert.hasAttributesSatisfyingExactly(
+        equalTo(stringKey("aws.agent"), "java-aws-sdk"),
+        equalTo(MESSAGING_DESTINATION_NAME, topicArn),
+        satisfies(stringKey("aws.endpoint"), v -> v.isInstanceOf(String.class)),
+        satisfies(AWS_REQUEST_ID, v -> v.isInstanceOf(String.class)),
+        equalTo(RPC_METHOD, rpcMethod),
+        equalTo(RPC_SYSTEM, "aws-api"),
+        equalTo(RPC_SERVICE, "AmazonSNS"),
+        equalTo(stringKey("aws.auth.account.access_key"), "test"),
+        equalTo(HTTP_REQUEST_METHOD, "POST"),
+        equalTo(HTTP_RESPONSE_STATUS_CODE, 200),
+        satisfies(URL_FULL, val -> val.startsWith("http://")),
+        satisfies(SERVER_ADDRESS, v -> v.isInstanceOf(String.class)),
+        equalTo(NETWORK_PROTOCOL_VERSION, "1.1"),
+        satisfies(
+            SERVER_PORT,
+            val ->
+                val.satisfiesAnyOf(
+                    v -> assertThat(v).isNull(), v -> assertThat(v).isInstanceOf(Number.class))),
+        equalTo(stringKey("aws.sns.topic.arn"), topicArn));
   }
 }
