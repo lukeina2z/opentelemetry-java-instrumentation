@@ -65,6 +65,7 @@ class AwsSpanAssertions {
       throw new IllegalStateException("can't get rpc method from span name " + spanName);
     }
 
+<<<<<<< HEAD
     List<AttributeAssertion> attributeAssertions =
         new ArrayList<>(
             asList(
@@ -94,6 +95,39 @@ class AwsSpanAssertions {
                 equalTo(RPC_SYSTEM, "aws-api"),
                 satisfies(RPC_METHOD, stringAssert -> stringAssert.isEqualTo(rpcMethod)),
                 equalTo(RPC_SERVICE, "AmazonSQS")));
+=======
+    List<AttributeAssertion> attributeAssertions = new ArrayList<>();
+    attributeAssertions.addAll(
+        Arrays.asList(
+            equalTo(stringKey("aws.agent"), "java-aws-sdk"),
+            satisfies(stringKey("aws.endpoint"), val -> val.isInstanceOf(String.class)),
+            satisfies(
+                stringKey("aws.queue.name"),
+                val ->
+                    val.satisfiesAnyOf(
+                        v -> assertThat(v).isEqualTo(queueName), v -> assertThat(v).isNull())),
+            satisfies(
+                stringKey("aws.queue.url"),
+                val ->
+                    val.satisfiesAnyOf(
+                        v -> assertThat(v).isEqualTo(queueUrl), v -> assertThat(v).isNull())),
+            satisfies(AWS_REQUEST_ID, val -> val.isInstanceOf(String.class)),
+            equalTo(HTTP_REQUEST_METHOD, "POST"),
+            equalTo(HTTP_RESPONSE_STATUS_CODE, 200),
+            satisfies(URL_FULL, val -> val.isInstanceOf(String.class)),
+            satisfies(SERVER_ADDRESS, stringAssert -> stringAssert.isInstanceOf(String.class)),
+            satisfies(
+                SERVER_PORT,
+                val ->
+                    val.satisfiesAnyOf(
+                        v -> assertThat(v).isNull(),
+                        v -> assertThat(v).isInstanceOf(Number.class))),
+            equalTo(NETWORK_PROTOCOL_VERSION, "1.1"),
+            equalTo(RPC_SYSTEM, "aws-api"),
+            satisfies(RPC_METHOD, stringAssert -> stringAssert.isEqualTo(rpcMethod)),
+            equalTo(RPC_SERVICE, "AmazonSQS"),
+            equalTo(stringKey("aws.auth.account.access_key"), "x")));
+>>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
 
     if (spanName.endsWith("receive")
         || spanName.endsWith("process")

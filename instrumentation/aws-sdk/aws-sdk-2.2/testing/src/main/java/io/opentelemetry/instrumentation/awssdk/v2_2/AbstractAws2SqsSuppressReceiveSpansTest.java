@@ -84,6 +84,8 @@ public abstract class AbstractAws2SqsSuppressReceiveSpansTest extends AbstractAw
                               equalTo(RPC_METHOD, "ReceiveMessage"),
                               equalTo(HTTP_REQUEST_METHOD, "POST"),
                               equalTo(HTTP_RESPONSE_STATUS_CODE, 200),
+                              equalTo(stringKey("aws.auth.account.access_key"), "my-access-key"),
+                              equalTo(stringKey("aws.auth.region"), "ap-northeast-1"),
                               satisfies(URL_FULL, v -> v.startsWith("http://localhost:" + sqsPort)),
                               equalTo(SERVER_ADDRESS, "localhost"),
                               equalTo(SERVER_PORT, sqsPort))));

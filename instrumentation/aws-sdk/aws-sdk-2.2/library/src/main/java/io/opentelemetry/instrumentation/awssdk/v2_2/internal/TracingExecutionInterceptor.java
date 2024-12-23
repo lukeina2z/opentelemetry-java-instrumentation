@@ -5,6 +5,10 @@
 
 package io.opentelemetry.instrumentation.awssdk.v2_2.internal;
 
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_AUTH_ACCESS_KEY;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_AUTH_REGION;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.GEN_AI_SYSTEM;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.BEDROCKRUNTIME;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.DYNAMODB;
 
 import io.opentelemetry.api.common.AttributeKey;
@@ -28,6 +32,11 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+<<<<<<< HEAD
+=======
+import software.amazon.awssdk.auth.credentials.AwsCredentials;
+import software.amazon.awssdk.auth.signer.AwsSignerExecutionAttribute;
+>>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
 import software.amazon.awssdk.awscore.AwsResponse;
 import software.amazon.awssdk.core.ClientType;
 import software.amazon.awssdk.core.SdkRequest;
@@ -39,6 +48,7 @@ import software.amazon.awssdk.core.interceptor.ExecutionInterceptor;
 import software.amazon.awssdk.core.interceptor.SdkExecutionAttribute;
 import software.amazon.awssdk.http.SdkHttpRequest;
 import software.amazon.awssdk.http.SdkHttpResponse;
+import software.amazon.awssdk.regions.Region;
 
 /**
  * AWS request execution interceptor.
@@ -47,6 +57,7 @@ import software.amazon.awssdk.http.SdkHttpResponse;
  * at any time.
  */
 public final class TracingExecutionInterceptor implements ExecutionInterceptor {
+  private static final String GEN_AI_SYSTEM_BEDROCK = "aws.bedrock";
 
   // copied from AwsIncubatingAttributes
   private static final AttributeKey<String> AWS_REQUEST_ID =
@@ -294,6 +305,26 @@ public final class TracingExecutionInterceptor implements ExecutionInterceptor {
     SdkHttpRequest httpRequest = context.httpRequest();
     executionAttributes.putAttribute(SDK_HTTP_REQUEST_ATTRIBUTE, httpRequest);
 
+    if (captureExperimentalSpanAttributes) {
+      AwsCredentials credentials =
+          executionAttributes.getAttribute(AwsSignerExecutionAttribute.AWS_CREDENTIALS);
+      Region signingRegion =
+          executionAttributes.getAttribute(AwsSignerExecutionAttribute.SIGNING_REGION);
+      Span span = Span.fromContext(otelContext);
+
+      if (credentials != null) {
+        String accessKeyId = credentials.accessKeyId();
+        if (accessKeyId != null) {
+          span.setAttribute(AWS_AUTH_ACCESS_KEY, accessKeyId);
+        }
+      }
+
+      if (signingRegion != null) {
+        String region = signingRegion.toString();
+        span.setAttribute(AWS_AUTH_REGION, region);
+      }
+    }
+
     // We ought to pass the parent of otelContext here, but we didn't store it, and it shouldn't
     // make a difference (unless we start supporting the http.resend_count attribute in this
     // instrumentation, which, logically, we can't on this level of abstraction)
@@ -355,6 +386,35 @@ public final class TracingExecutionInterceptor implements ExecutionInterceptor {
     return responseBody;
   }
 
+<<<<<<< HEAD
+=======
+  private void populateRequestAttributes(
+      Span span,
+      AwsSdkRequest awsSdkRequest,
+      SdkRequest sdkRequest,
+      ExecutionAttributes attributes) {
+
+    fieldMapper.mapToAttributes(sdkRequest, awsSdkRequest, span);
+
+    if (awsSdkRequest.type() == DYNAMODB) {
+      span.setAttribute(DB_SYSTEM, DB_SYSTEM_DYNAMODB);
+      String operation = attributes.getAttribute(SdkExecutionAttribute.OPERATION_NAME);
+      if (operation != null) {
+        if (SemconvStability.emitStableDatabaseSemconv()) {
+          span.setAttribute(DB_OPERATION_NAME, operation);
+        }
+        if (SemconvStability.emitOldDatabaseSemconv()) {
+          span.setAttribute(DB_OPERATION, operation);
+        }
+      }
+    }
+
+    if (awsSdkRequest.type() == BEDROCKRUNTIME) {
+      span.setAttribute(GEN_AI_SYSTEM, GEN_AI_SYSTEM_BEDROCK);
+    }
+  }
+
+>>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
   @Override
   public void afterExecution(
       Context.AfterExecution context, ExecutionAttributes executionAttributes) {

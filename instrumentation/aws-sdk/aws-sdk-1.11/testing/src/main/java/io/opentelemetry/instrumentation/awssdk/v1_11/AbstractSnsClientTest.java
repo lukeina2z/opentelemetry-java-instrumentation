@@ -5,6 +5,7 @@
 
 package io.opentelemetry.instrumentation.awssdk.v1_11;
 
+import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.equalTo;
 import static io.opentelemetry.semconv.incubating.AwsIncubatingAttributes.AWS_SNS_TOPIC_ARN;
 import static io.opentelemetry.semconv.incubating.MessagingIncubatingAttributes.MESSAGING_DESTINATION_NAME;
@@ -20,11 +21,7 @@ import io.opentelemetry.testing.internal.armeria.common.HttpResponse;
 import io.opentelemetry.testing.internal.armeria.common.HttpStatus;
 import io.opentelemetry.testing.internal.armeria.common.MediaType;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Stream;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractSnsClientTest extends AbstractBaseAwsClientTest {
   private static final String publishResponseBody =
@@ -54,6 +51,7 @@ public abstract class AbstractSnsClientTest extends AbstractBaseAwsClientTest {
     return true;
   }
 
+<<<<<<< HEAD
   @ParameterizedTest
   @MethodSource("provideArguments")
   void testSendRequestWithMockedResponse(
@@ -62,6 +60,10 @@ public abstract class AbstractSnsClientTest extends AbstractBaseAwsClientTest {
       String responseBody,
       List<AttributeAssertion> additionalAttributes)
       throws Exception {
+=======
+  @Test
+  public void testSendRequestWithwithTopicArnMockedResponse() throws Exception {
+>>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
     AmazonSNSClientBuilder clientBuilder = AmazonSNSClientBuilder.standard();
     AmazonSNS client =
         configureClient(clientBuilder)
@@ -69,12 +71,36 @@ public abstract class AbstractSnsClientTest extends AbstractBaseAwsClientTest {
             .withCredentials(credentialsProvider)
             .build();
 
+<<<<<<< HEAD
     server.enqueue(HttpResponse.of(HttpStatus.OK, MediaType.PLAIN_TEXT_UTF_8, responseBody));
     Object response = call.apply(client);
+=======
+    String body =
+        "<PublishResponse xmlns=\"https://sns.amazonaws.com/doc/2010-03-31/\">"
+            + "    <PublishResult>"
+            + "        <MessageId>567910cd-659e-55d4-8ccb-5aaf14679dc0</MessageId>"
+            + "    </PublishResult>"
+            + "    <ResponseMetadata>"
+            + "        <RequestId>d74b8436-ae13-5ab4-a9ff-ce54dfea72a0</RequestId>"
+            + "    </ResponseMetadata>"
+            + "</PublishResponse>";
+
+    server.enqueue(HttpResponse.of(HttpStatus.OK, MediaType.PLAIN_TEXT_UTF_8, body));
+
+    List<AttributeAssertion> additionalAttributes =
+        asList(
+            equalTo(stringKey(MESSAGING_DESTINATION_NAME.getKey()), "somearn"),
+            equalTo(stringKey("aws.sns.topic.arn"), "somearn"));
+
+    Object response =
+        client.publish(new PublishRequest().withMessage("somemessage").withTopicArn("somearn"));
+
+>>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
     assertRequestWithMockedResponse(
         response, client, "SNS", operation, "POST", additionalAttributes);
   }
 
+<<<<<<< HEAD
   private static Stream<Arguments> provideArguments() {
     return Stream.of(
         Arguments.of(
@@ -102,5 +128,35 @@ public abstract class AbstractSnsClientTest extends AbstractBaseAwsClientTest {
             createTopicResponseBody,
             singletonList(
                 equalTo(AWS_SNS_TOPIC_ARN, "arn:aws:sns:us-east-1:123456789012:sns-topic-foo"))));
+=======
+  @Test
+  public void testSendRequestWithwithTargetArnMockedResponse() throws Exception {
+    AmazonSNSClientBuilder clientBuilder = AmazonSNSClientBuilder.standard();
+    AmazonSNS client =
+        configureClient(clientBuilder)
+            .withEndpointConfiguration(endpoint)
+            .withCredentials(credentialsProvider)
+            .build();
+
+    String body =
+        "<PublishResponse xmlns=\"https://sns.amazonaws.com/doc/2010-03-31/\">"
+            + "    <PublishResult>"
+            + "        <MessageId>567910cd-659e-55d4-8ccb-5aaf14679dc0</MessageId>"
+            + "    </PublishResult>"
+            + "    <ResponseMetadata>"
+            + "        <RequestId>d74b8436-ae13-5ab4-a9ff-ce54dfea72a0</RequestId>"
+            + "    </ResponseMetadata>"
+            + "</PublishResponse>";
+
+    server.enqueue(HttpResponse.of(HttpStatus.OK, MediaType.PLAIN_TEXT_UTF_8, body));
+
+    List<AttributeAssertion> additionalAttributes =
+        singletonList(equalTo(stringKey(MESSAGING_DESTINATION_NAME.getKey()), "somearn"));
+
+    Object response =
+        client.publish(new PublishRequest().withMessage("somemessage").withTargetArn("somearn"));
+    assertRequestWithMockedResponse(
+        response, client, "SNS", "Publish", "POST", additionalAttributes);
+>>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
   }
 }

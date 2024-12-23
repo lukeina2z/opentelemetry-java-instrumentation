@@ -18,11 +18,16 @@ import static io.opentelemetry.semconv.incubating.DbIncubatingAttributes.DB_OPER
 import static io.opentelemetry.semconv.incubating.DbIncubatingAttributes.DB_SYSTEM;
 import static io.opentelemetry.semconv.incubating.DbIncubatingAttributes.DbSystemNameIncubatingValues.AWS_DYNAMODB;
 import static java.util.Collections.singletonList;
+import static org.junit.Assert.assertEquals;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
+<<<<<<< HEAD
 import io.opentelemetry.instrumentation.api.internal.SemconvStability;
+=======
+import com.amazonaws.services.dynamodbv2.model.DescribeTableRequest;
+>>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
 import io.opentelemetry.sdk.testing.assertj.AttributeAssertion;
 import io.opentelemetry.semconv.incubating.DbIncubatingAttributes;
 import io.opentelemetry.testing.internal.armeria.common.HttpResponse;
@@ -75,5 +80,40 @@ public abstract class AbstractDynamoDbClientTest extends AbstractBaseAwsClientTe
         DB_OPERATION_NAME,
         SERVER_ADDRESS,
         SERVER_PORT);
+  }
+
+  @Test
+  public void testGetTableArnWithMockedResponse() {
+    AmazonDynamoDBClientBuilder clientBuilder = AmazonDynamoDBClientBuilder.standard();
+    AmazonDynamoDB client =
+        configureClient(clientBuilder)
+            .withEndpointConfiguration(endpoint)
+            .withCredentials(credentialsProvider)
+            .build();
+
+    String tableName = "MockTable";
+    String expectedArn = "arn:aws:dynamodb:us-west-2:123456789012:table/" + tableName;
+
+    String body =
+        "{\n"
+            + "\"Table\": {\n"
+            + "\"TableName\": \""
+            + tableName
+            + "\",\n"
+            + "\"TableArn\": \""
+            + expectedArn
+            + "\"\n"
+            + "}\n"
+            + "}";
+
+    server.enqueue(HttpResponse.of(HttpStatus.OK, MediaType.JSON_UTF_8, body));
+
+    String actualArn =
+        client
+            .describeTable(new DescribeTableRequest().withTableName(tableName))
+            .getTable()
+            .getTableArn();
+
+    assertEquals("Table ARN should match expected value", expectedArn, actualArn);
   }
 }

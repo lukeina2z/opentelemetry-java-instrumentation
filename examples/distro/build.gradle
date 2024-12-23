@@ -12,9 +12,15 @@ buildscript {
     }
   }
   dependencies {
+<<<<<<< HEAD
     classpath "com.diffplug.spotless:spotless-plugin-gradle:7.1.0"
     classpath "com.gradleup.shadow:shadow-gradle-plugin:8.3.8"
     classpath "io.opentelemetry.instrumentation:gradle-plugins:2.18.1-alpha"
+=======
+    classpath "com.diffplug.spotless:spotless-plugin-gradle:6.25.0"
+    classpath "com.gradleup.shadow:shadow-gradle-plugin:8.3.5"
+    classpath "io.opentelemetry.instrumentation:gradle-plugins:2.11.0-alpha"
+>>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
   }
 }
 
@@ -30,8 +36,13 @@ subprojects {
       opentelemetrySdk           : "1.52.0",
 
       // these lines are managed by .github/scripts/update-version.sh
+<<<<<<< HEAD
       opentelemetryJavaagent     : "2.18.1",
       opentelemetryJavaagentAlpha: "2.18.1-alpha",
+=======
+      opentelemetryJavaagent     : "2.11.0",
+      opentelemetryJavaagentAlpha: "2.11.0-alpha",
+>>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
 
       autoservice                : "1.1.1"
     ]

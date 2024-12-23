@@ -173,6 +173,11 @@ public abstract class AbstractS3ClientTest extends AbstractBaseAwsClientTest {
                                 equalTo(RPC_SYSTEM, "aws-api"),
                                 equalTo(RPC_SERVICE, "Amazon S3"),
                                 equalTo(RPC_METHOD, "GetObject"),
+<<<<<<< HEAD
+=======
+                                equalTo(stringKey("aws.auth.account.access_key"), "my-access-key"),
+                                equalTo(stringKey("aws.endpoint"), server.httpUri().toString()),
+>>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
                                 equalTo(stringKey("aws.agent"), "java-aws-sdk"),
                                 equalTo(stringKey("aws.bucket.name"), "someBucket"),
                                 equalTo(ERROR_TYPE, SdkClientException.class.getName()))));

@@ -48,7 +48,18 @@ dependencies {
   testLibrary("com.amazonaws:aws-java-sdk-rds:1.11.106")
   testLibrary("com.amazonaws:aws-java-sdk-s3:1.11.106")
   testLibrary("com.amazonaws:aws-java-sdk-sns:1.11.106")
+<<<<<<< HEAD
   testLibrary("com.amazonaws:aws-java-sdk-stepfunctions:1.11.106")
+=======
+  testLibrary("com.amazonaws:aws-java-sdk-sqs:1.11.106")
+  testLibrary("com.amazonaws:aws-java-sdk-secretsmanager:1.11.309")
+  testLibrary("com.amazonaws:aws-java-sdk-stepfunctions:1.11.230")
+  testLibrary("com.amazonaws:aws-java-sdk-lambda:1.11.678")
+  testLibrary("com.amazonaws:aws-java-sdk-bedrock:1.12.744")
+  testLibrary("com.amazonaws:aws-java-sdk-bedrockagent:1.12.744")
+  testLibrary("com.amazonaws:aws-java-sdk-bedrockagentruntime:1.12.744")
+  testLibrary("com.amazonaws:aws-java-sdk-bedrockruntime:1.12.744")
+>>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
 
   testImplementation(project(":instrumentation:aws-sdk:aws-sdk-1.11:testing"))
 

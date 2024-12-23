@@ -115,7 +115,8 @@ public abstract class AbstractSqsSuppressReceiveSpansTest {
                                 equalTo(URL_FULL, "http://localhost:" + sqsPort),
                                 equalTo(SERVER_ADDRESS, "localhost"),
                                 equalTo(SERVER_PORT, sqsPort),
-                                equalTo(NETWORK_PROTOCOL_VERSION, "1.1"))),
+                                equalTo(NETWORK_PROTOCOL_VERSION, "1.1"),
+                                equalTo(stringKey("aws.auth.account.access_key"), "x"))),
             trace ->
                 trace.hasSpansSatisfyingExactly(
                     span ->
@@ -144,7 +145,8 @@ public abstract class AbstractSqsSuppressReceiveSpansTest {
                                 equalTo(MESSAGING_OPERATION, "publish"),
                                 satisfies(
                                     MESSAGING_MESSAGE_ID, val -> val.isInstanceOf(String.class)),
-                                equalTo(NETWORK_PROTOCOL_VERSION, "1.1")),
+                                equalTo(NETWORK_PROTOCOL_VERSION, "1.1"),
+                                equalTo(stringKey("aws.auth.account.access_key"), "x")),
                     span ->
                         span.hasName("testSdkSqs process")
                             .hasKind(SpanKind.CONSUMER)
@@ -171,7 +173,8 @@ public abstract class AbstractSqsSuppressReceiveSpansTest {
                                 equalTo(MESSAGING_OPERATION, "process"),
                                 satisfies(
                                     MESSAGING_MESSAGE_ID, val -> val.isInstanceOf(String.class)),
-                                equalTo(NETWORK_PROTOCOL_VERSION, "1.1")),
+                                equalTo(NETWORK_PROTOCOL_VERSION, "1.1"),
+                                equalTo(stringKey("aws.auth.account.access_key"), "x")),
                     span ->
                         span.hasName("process child")
                             .hasParent(trace.getSpan(1))
@@ -218,7 +221,8 @@ public abstract class AbstractSqsSuppressReceiveSpansTest {
                                 equalTo(URL_FULL, "http://localhost:" + sqsPort),
                                 equalTo(SERVER_ADDRESS, "localhost"),
                                 equalTo(SERVER_PORT, sqsPort),
-                                equalTo(NETWORK_PROTOCOL_VERSION, "1.1"))),
+                                equalTo(NETWORK_PROTOCOL_VERSION, "1.1"),
+                                equalTo(stringKey("aws.auth.account.access_key"), "x"))),
             trace ->
                 trace.hasSpansSatisfyingExactly(
                     span ->
@@ -247,7 +251,8 @@ public abstract class AbstractSqsSuppressReceiveSpansTest {
                                 equalTo(MESSAGING_OPERATION, "publish"),
                                 satisfies(
                                     MESSAGING_MESSAGE_ID, val -> val.isInstanceOf(String.class)),
-                                equalTo(NETWORK_PROTOCOL_VERSION, "1.1")),
+                                equalTo(NETWORK_PROTOCOL_VERSION, "1.1"),
+                                equalTo(stringKey("aws.auth.account.access_key"), "x")),
                     span ->
                         span.hasName("testSdkSqs process")
                             .hasKind(SpanKind.CONSUMER)
@@ -274,7 +279,8 @@ public abstract class AbstractSqsSuppressReceiveSpansTest {
                                 equalTo(MESSAGING_OPERATION, "process"),
                                 satisfies(
                                     MESSAGING_MESSAGE_ID, val -> val.isInstanceOf(String.class)),
-                                equalTo(NETWORK_PROTOCOL_VERSION, "1.1")),
+                                equalTo(NETWORK_PROTOCOL_VERSION, "1.1"),
+                                equalTo(stringKey("aws.auth.account.access_key"), "x")),
                     span ->
                         span.hasName("process child")
                             .hasParent(trace.getSpan(1))
@@ -304,7 +310,8 @@ public abstract class AbstractSqsSuppressReceiveSpansTest {
                                 equalTo(URL_FULL, "http://localhost:" + sqsPort),
                                 equalTo(SERVER_ADDRESS, "localhost"),
                                 equalTo(SERVER_PORT, sqsPort),
-                                equalTo(NETWORK_PROTOCOL_VERSION, "1.1"))));
+                                equalTo(NETWORK_PROTOCOL_VERSION, "1.1"),
+                                equalTo(stringKey("aws.auth.account.access_key"), "x"))));
   }
 
   @Test

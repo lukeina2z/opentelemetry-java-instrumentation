@@ -7,13 +7,19 @@ package io.opentelemetry.instrumentation.awssdk.v1_11;
 
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.equalTo;
+<<<<<<< HEAD
 import static io.opentelemetry.semconv.incubating.AwsIncubatingAttributes.AWS_LAMBDA_RESOURCE_MAPPING_ID;
 import static java.util.Arrays.asList;
+=======
+>>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
 import static java.util.Collections.singletonList;
 
 import com.amazonaws.services.lambda.AWSLambda;
 import com.amazonaws.services.lambda.AWSLambdaClientBuilder;
+<<<<<<< HEAD
 import com.amazonaws.services.lambda.model.CreateEventSourceMappingRequest;
+=======
+>>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
 import com.amazonaws.services.lambda.model.GetEventSourceMappingRequest;
 import com.amazonaws.services.lambda.model.GetFunctionRequest;
 import io.opentelemetry.sdk.testing.assertj.AttributeAssertion;
@@ -28,6 +34,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 public abstract class AbstractLambdaClientTest extends AbstractBaseAwsClientTest {
+<<<<<<< HEAD
   private static final String lambdaCreateEventSourceMappingResponseBody =
       "{"
           + "\"UUID\": \"e31def54-5e5d-4c1b-8e0f-bf1b11c137b7\","
@@ -112,6 +119,8 @@ public abstract class AbstractLambdaClientTest extends AbstractBaseAwsClientTest
           + "     \"Location\": \"https://awslambda-us-west-2-tasks.s3.us-west-2.amazonaws.com/snapshots/123456789012/lambda-function-name-foo-47425b12\""
           + " }"
           + "}";
+=======
+>>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
 
   public abstract AWSLambdaClientBuilder configureClient(AWSLambdaClientBuilder client);
 
@@ -120,6 +129,7 @@ public abstract class AbstractLambdaClientTest extends AbstractBaseAwsClientTest
     return false;
   }
 
+<<<<<<< HEAD
   private static Stream<Arguments> provideArguments() {
     return Stream.of(
         Arguments.of(
@@ -174,15 +184,49 @@ public abstract class AbstractLambdaClientTest extends AbstractBaseAwsClientTest
       Function<AWSLambda, Object> call)
       throws Exception {
     AWSLambdaClientBuilder clientBuilder = AWSLambdaClientBuilder.standard();
+=======
+  @ParameterizedTest
+  @MethodSource("provideArguments")
+  public void testSendRequestWithMockedResponse(
+      String operation,
+      List<AttributeAssertion> additionalAttributes,
+      Function<AWSLambda, Object> call)
+      throws Exception {
+
+    AWSLambdaClientBuilder clientBuilder = AWSLambdaClientBuilder.standard();
+
+>>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
     AWSLambda client =
         configureClient(clientBuilder)
             .withEndpointConfiguration(endpoint)
             .withCredentials(credentialsProvider)
             .build();
 
+<<<<<<< HEAD
     server.enqueue(HttpResponse.of(HttpStatus.OK, MediaType.PLAIN_TEXT_UTF_8, responseBody));
     Object response = call.apply(client);
     assertRequestWithMockedResponse(
         response, client, "AWSLambda", operation, method, additionalAttributes);
+=======
+    server.enqueue(HttpResponse.of(HttpStatus.OK, MediaType.PLAIN_TEXT_UTF_8, ""));
+
+    Object response = call.apply(client);
+    assertRequestWithMockedResponse(
+        response, client, "AWSLambda", operation, "GET", additionalAttributes);
+  }
+
+  private static Stream<Arguments> provideArguments() {
+    return Stream.of(
+        Arguments.of(
+            "GetEventSourceMapping",
+            singletonList(equalTo(stringKey("aws.lambda.resource_mapping.id"), "uuid")),
+            (Function<AWSLambda, Object>)
+                c -> c.getEventSourceMapping(new GetEventSourceMappingRequest().withUUID("uuid"))),
+        Arguments.of(
+            "GetFunction",
+            singletonList(equalTo(stringKey("aws.lambda.function.name"), "functionName")),
+            (Function<AWSLambda, Object>)
+                c -> c.getFunction(new GetFunctionRequest().withFunctionName("functionName"))));
+>>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
   }
 }

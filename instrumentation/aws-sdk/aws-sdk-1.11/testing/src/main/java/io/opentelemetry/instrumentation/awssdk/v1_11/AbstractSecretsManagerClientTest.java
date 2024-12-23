@@ -5,19 +5,30 @@
 
 package io.opentelemetry.instrumentation.awssdk.v1_11;
 
+<<<<<<< HEAD
 import static io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.equalTo;
 import static io.opentelemetry.semconv.incubating.AwsIncubatingAttributes.AWS_SECRETSMANAGER_SECRET_ARN;
+=======
+import static io.opentelemetry.api.common.AttributeKey.stringKey;
+import static io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.equalTo;
+>>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
 import static java.util.Collections.singletonList;
 
 import com.amazonaws.services.secretsmanager.AWSSecretsManager;
 import com.amazonaws.services.secretsmanager.AWSSecretsManagerClientBuilder;
 import com.amazonaws.services.secretsmanager.model.CreateSecretRequest;
+<<<<<<< HEAD
 import com.amazonaws.services.secretsmanager.model.DescribeSecretRequest;
 import io.opentelemetry.sdk.testing.assertj.AttributeAssertion;
 import io.opentelemetry.testing.internal.armeria.common.HttpResponse;
 import io.opentelemetry.testing.internal.armeria.common.HttpStatus;
 import io.opentelemetry.testing.internal.armeria.common.MediaType;
 import java.util.List;
+=======
+import io.opentelemetry.testing.internal.armeria.common.HttpResponse;
+import io.opentelemetry.testing.internal.armeria.common.HttpStatus;
+import io.opentelemetry.testing.internal.armeria.common.MediaType;
+>>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
 import org.junit.jupiter.api.Test;
 
 public abstract class AbstractSecretsManagerClientTest extends AbstractBaseAwsClientTest {
@@ -27,11 +38,19 @@ public abstract class AbstractSecretsManagerClientTest extends AbstractBaseAwsCl
 
   @Override
   protected boolean hasRequestId() {
+<<<<<<< HEAD
     return false;
   }
 
   @Test
   public void sendCreateSecretRequestWithMockedResponse() throws Exception {
+=======
+    return true;
+  }
+
+  @Test
+  public void sendRequestWithMockedResponse() throws Exception {
+>>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
     AWSSecretsManagerClientBuilder clientBuilder = AWSSecretsManagerClientBuilder.standard();
     AWSSecretsManager client =
         configureClient(clientBuilder)
@@ -51,6 +70,7 @@ public abstract class AbstractSecretsManagerClientTest extends AbstractBaseAwsCl
         client.createSecret(
             new CreateSecretRequest().withName("secretName").withSecretString("secretValue"));
 
+<<<<<<< HEAD
     List<AttributeAssertion> additionalAttributes =
         singletonList(
             equalTo(
@@ -89,5 +109,17 @@ public abstract class AbstractSecretsManagerClientTest extends AbstractBaseAwsCl
 
     assertRequestWithMockedResponse(
         response, client, "AWSSecretsManager", "DescribeSecret", "POST", additionalAttributes);
+=======
+    assertRequestWithMockedResponse(
+        response,
+        client,
+        "AWSSecretsManager",
+        "CreateSecret",
+        "POST",
+        singletonList(
+            equalTo(
+                stringKey("aws.secretsmanager.secret.arn"),
+                "arn:aws:secretsmanager:us-west-2:123456789012:secret:MyTestDatabaseSecret-a1b2c3")));
+>>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
   }
 }

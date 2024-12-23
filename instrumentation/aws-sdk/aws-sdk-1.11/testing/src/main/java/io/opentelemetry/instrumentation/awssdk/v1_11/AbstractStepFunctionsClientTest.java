@@ -5,9 +5,14 @@
 
 package io.opentelemetry.instrumentation.awssdk.v1_11;
 
+<<<<<<< HEAD
 import static io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.equalTo;
 import static io.opentelemetry.semconv.incubating.AwsIncubatingAttributes.AWS_STEP_FUNCTIONS_ACTIVITY_ARN;
 import static io.opentelemetry.semconv.incubating.AwsIncubatingAttributes.AWS_STEP_FUNCTIONS_STATE_MACHINE_ARN;
+=======
+import static io.opentelemetry.api.common.AttributeKey.stringKey;
+import static io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.equalTo;
+>>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
 import static java.util.Collections.singletonList;
 
 import com.amazonaws.services.stepfunctions.AWSStepFunctions;
@@ -62,14 +67,23 @@ public abstract class AbstractStepFunctionsClientTest extends AbstractBaseAwsCli
     return Stream.of(
         Arguments.of(
             "DescribeStateMachine",
+<<<<<<< HEAD
             singletonList(equalTo(AWS_STEP_FUNCTIONS_STATE_MACHINE_ARN, "stateMachineArn")),
+=======
+            singletonList(
+                equalTo(stringKey("aws.stepfunctions.state_machine.arn"), "stateMachineArn")),
+>>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
             (Function<AWSStepFunctions, Object>)
                 c ->
                     c.describeStateMachine(
                         new DescribeStateMachineRequest().withStateMachineArn("stateMachineArn"))),
         Arguments.of(
             "DescribeActivity",
+<<<<<<< HEAD
             singletonList(equalTo(AWS_STEP_FUNCTIONS_ACTIVITY_ARN, "activityArn")),
+=======
+            singletonList(equalTo(stringKey("aws.stepfunctions.activity.arn"), "activityArn")),
+>>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
             (Function<AWSStepFunctions, Object>)
                 c ->
                     c.describeActivity(
