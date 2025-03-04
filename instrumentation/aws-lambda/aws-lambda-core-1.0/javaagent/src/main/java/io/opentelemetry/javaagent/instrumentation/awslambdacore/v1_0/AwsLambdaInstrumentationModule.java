@@ -34,6 +34,7 @@ public class AwsLambdaInstrumentationModule extends InstrumentationModule {
 
   @Override
   public List<TypeInstrumentation> typeInstrumentations() {
+
     return Arrays.asList(
         new AwsLambdaRequestHandlerInstrumentation(),
         new AwsLambdaRequestStreamHandlerInstrumentation());
