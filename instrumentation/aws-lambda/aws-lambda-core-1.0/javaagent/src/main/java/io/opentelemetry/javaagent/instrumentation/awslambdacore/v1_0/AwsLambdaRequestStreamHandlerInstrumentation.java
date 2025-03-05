@@ -27,12 +27,7 @@ import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.implementation.bytecode.assign.Assigner.Typing;
 import net.bytebuddy.matcher.ElementMatcher;
 
-// import java.util.logging.Logger;
-
 public class AwsLambdaRequestStreamHandlerInstrumentation implements TypeInstrumentation {
-
-  // private static final Logger logger =
-  // Logger.getLogger(AwsLambdaRequestStreamHandlerInstrumentation.class.getName());
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderOptimization() {
@@ -50,8 +45,6 @@ public class AwsLambdaRequestStreamHandlerInstrumentation implements TypeInstrum
         isMethod()
             .and(isPublic())
             .and(named("handleRequest"))
-            // .and(takesArgument(0, named("java.io.InputStream")))
-            // .and(takesArgument(1, named("java.io.OutputStream")))
             .and(takesArgument(2, named("com.amazonaws.services.lambda.runtime.Context"))),
         AwsLambdaRequestStreamHandlerInstrumentation.class.getName() + "$HandleRequestAdvice");
   }
@@ -70,13 +63,10 @@ public class AwsLambdaRequestStreamHandlerInstrumentation implements TypeInstrum
       otelInput = AwsLambdaRequest.create(context, input, Collections.emptyMap());
       io.opentelemetry.context.Context parentContext = functionInstrumenter().extract(otelInput);
 
-      // logger.warning("xxxlog: in the constructor of AwsLambdaInstrumentationModule");
-
       if (!functionInstrumenter().shouldStart(parentContext, otelInput)) {
         return;
       }
 
-      // logger.warning("xxxlog: right before stream handler start instrumenter start()");
       otelContext = functionInstrumenter().start(parentContext, otelInput);
       otelScope = otelContext.makeCurrent();
     }
@@ -89,7 +79,6 @@ public class AwsLambdaRequestStreamHandlerInstrumentation implements TypeInstrum
         @Advice.Local("otelContext") io.opentelemetry.context.Context functionContext,
         @Advice.Local("otelScope") Scope functionScope) {
 
-      // logger.warning("xxxlog: in stream handler stopSpan() call");
       if (functionScope != null) {
         functionScope.close();
         functionInstrumenter().end(functionContext, input, null, throwable);

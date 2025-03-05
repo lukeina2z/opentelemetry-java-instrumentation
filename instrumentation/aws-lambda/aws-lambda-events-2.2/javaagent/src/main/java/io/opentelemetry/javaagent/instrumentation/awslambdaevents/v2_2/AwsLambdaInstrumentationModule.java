@@ -6,7 +6,6 @@
 package io.opentelemetry.javaagent.instrumentation.awslambdaevents.v2_2;
 
 import static io.opentelemetry.javaagent.extension.matcher.AgentElementMatchers.hasClassesNamed;
-// import static java.util.Collections.singletonList;
 
 import com.google.auto.service.AutoService;
 import io.opentelemetry.javaagent.extension.instrumentation.InstrumentationModule;
@@ -15,20 +14,10 @@ import java.util.Arrays;
 import java.util.List;
 import net.bytebuddy.matcher.ElementMatcher;
 
-// import java.util.logging.Logger;
-
 @AutoService(InstrumentationModule.class)
 public class AwsLambdaInstrumentationModule extends InstrumentationModule {
-
-  // private static final Logger logger =
-  // Logger.getLogger(AwsLambdaInstrumentationModule.class.getName());
-
   public AwsLambdaInstrumentationModule() {
     super("aws-lambda-events", "aws-lambda-events-2.2", "aws-lambda");
-
-    // logger.info("xxxlog:xx300-d events-2.2 in the constructor of
-    // AwsLambdaInstrumentationModule");
-
   }
 
   @Override
@@ -43,8 +32,6 @@ public class AwsLambdaInstrumentationModule extends InstrumentationModule {
 
   @Override
   public List<TypeInstrumentation> typeInstrumentations() {
-    // return singletonList(new AwsLambdaRequestHandlerInstrumentation());
-    // return singletonList(new AwsLambdaRequestStreamHandlerInstrumentation());
     return Arrays.asList(
         new AwsLambdaRequestHandlerInstrumentation(),
         new AwsLambdaRequestStreamHandlerInstrumentation());

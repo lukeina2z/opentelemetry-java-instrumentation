@@ -27,12 +27,7 @@ import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.implementation.bytecode.assign.Assigner.Typing;
 import net.bytebuddy.matcher.ElementMatcher;
 
-// import java.util.logging.Logger;
-
 public class AwsLambdaRequestStreamHandlerInstrumentation implements TypeInstrumentation {
-
-  // private static final Logger logger =
-  // Logger.getLogger(AwsLambdaRequestStreamHandlerInstrumentation.class.getName());
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderOptimization() {
@@ -77,17 +72,8 @@ public class AwsLambdaRequestStreamHandlerInstrumentation implements TypeInstrum
 
       functionContext =
           AwsLambdaInstrumentationHelper.functionInstrumenter().start(parentContext, otelInput);
-      functionScope = functionContext.makeCurrent();
 
-      //  if (input instanceof SQSEvent) {
-      //    if (AwsLambdaInstrumentationHelper.messageInstrumenter()
-      //        .shouldStart(functionContext, (SQSEvent) input)) {
-      //      messageContext =
-      //          AwsLambdaInstrumentationHelper.messageInstrumenter()
-      //              .start(functionContext, (SQSEvent) input);
-      //      messageScope = messageContext.makeCurrent();
-      //    }
-      //  }
+      functionScope = functionContext.makeCurrent();
     }
 
     @Advice.OnMethodExit(onThrowable = Throwable.class, suppress = Throwable.class)
@@ -99,8 +85,6 @@ public class AwsLambdaRequestStreamHandlerInstrumentation implements TypeInstrum
         @Advice.Local("otelFunctionScope") Scope functionScope,
         @Advice.Local("otelMessageContext") io.opentelemetry.context.Context messageContext,
         @Advice.Local("otelMessageScope") Scope messageScope) {
-
-      // logger.warning("xxxlog: event 2.2: in stream handler stopSpan() call");
 
       if (messageScope != null) {
         messageScope.close();
