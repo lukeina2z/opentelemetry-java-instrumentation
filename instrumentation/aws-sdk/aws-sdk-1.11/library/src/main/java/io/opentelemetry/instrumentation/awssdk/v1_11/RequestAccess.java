@@ -21,6 +21,60 @@ final class RequestAccess {
       };
 
   @Nullable
+  static String getLambdaName(Object request) {
+    if (request == null) {
+      return null;
+    }
+    RequestAccess access = REQUEST_ACCESSORS.get(request.getClass());
+    return invokeOrNull(access.getLambdaName, request);
+  }
+
+  @Nullable
+  static String getLambdaResourceId(Object request) {
+    if (request == null) {
+      return null;
+    }
+    RequestAccess access = REQUEST_ACCESSORS.get(request.getClass());
+    return invokeOrNull(access.getLambdaResourceId, request);
+  }
+
+  @Nullable
+  static String getSecretArn(Object request) {
+    if (request == null) {
+      return null;
+    }
+    RequestAccess access = REQUEST_ACCESSORS.get(request.getClass());
+    return invokeOrNull(access.getSecretArn, request);
+  }
+
+  @Nullable
+  static String getSnsTopicArn(Object request) {
+    if (request == null) {
+      return null;
+    }
+    RequestAccess access = REQUEST_ACCESSORS.get(request.getClass());
+    return invokeOrNull(access.getSnsTopicArn, request);
+  }
+
+  @Nullable
+  static String getStepFunctionsActivityArn(Object request) {
+    if (request == null) {
+      return null;
+    }
+    RequestAccess access = REQUEST_ACCESSORS.get(request.getClass());
+    return invokeOrNull(access.getStepFunctionsActivityArn, request);
+  }
+
+  @Nullable
+  static String getStateMachineArn(Object request) {
+    if (request == null) {
+      return null;
+    }
+    RequestAccess access = REQUEST_ACCESSORS.get(request.getClass());
+    return invokeOrNull(access.getStateMachineArn, request);
+  }
+
+  @Nullable
   static String getBucketName(Object request) {
     RequestAccess access = REQUEST_ACCESSORS.get(request.getClass());
     return invokeOrNull(access.getBucketName, request);
@@ -81,6 +135,12 @@ final class RequestAccess {
   @Nullable private final MethodHandle getTableName;
   @Nullable private final MethodHandle getTopicArn;
   @Nullable private final MethodHandle getTargetArn;
+  @Nullable private final MethodHandle getStateMachineArn;
+  @Nullable private final MethodHandle getStepFunctionsActivityArn;
+  @Nullable private final MethodHandle getSnsTopicArn;
+  @Nullable private final MethodHandle getSecretArn;
+  @Nullable private final MethodHandle getLambdaName;
+  @Nullable private final MethodHandle getLambdaResourceId;
 
   private RequestAccess(Class<?> clz) {
     getBucketName = findAccessorOrNull(clz, "getBucketName");
@@ -90,6 +150,12 @@ final class RequestAccess {
     getTableName = findAccessorOrNull(clz, "getTableName");
     getTopicArn = findAccessorOrNull(clz, "getTopicArn");
     getTargetArn = findAccessorOrNull(clz, "getTargetArn");
+    getStateMachineArn = findAccessorOrNull(clz, "getStateMachineArn");
+    getStepFunctionsActivityArn = findAccessorOrNull(clz, "getActivityArn");
+    getSnsTopicArn = findAccessorOrNull(clz, "getTopicArn");
+    getSecretArn = findAccessorOrNull(clz, "getARN");
+    getLambdaName = findAccessorOrNull(clz, "getFunctionName");
+    getLambdaResourceId = findAccessorOrNull(clz, "getUUID");
   }
 
   @Nullable
