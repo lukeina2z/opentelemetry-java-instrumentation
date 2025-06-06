@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
 
 final class RequestAccess {
   private static final String LAMBDA_REQUEST_CLASS_PREFIX = "com.amazonaws.services.lambda.model.";
-  private static final String SECRET_MANAGER_REQUEST_CLASS_PREFIX =
+  private static final String SECRETS_MANAGER_REQUEST_CLASS_PREFIX =
       "com.amazonaws.services.secretsmanager.model.";
 
   private static final ClassValue<RequestAccess> REQUEST_ACCESSORS =
@@ -152,7 +152,7 @@ final class RequestAccess {
     getStateMachineArn = findAccessorOrNull(clz, "getStateMachineArn");
     getStepFunctionsActivityArn = findAccessorOrNull(clz, "getActivityArn");
     String className = clz.getName();
-    if (className.startsWith(SECRET_MANAGER_REQUEST_CLASS_PREFIX)) {
+    if (className.startsWith(SECRETS_MANAGER_REQUEST_CLASS_PREFIX)) {
       getSecretArn = findAccessorOrNull(clz, "getARN");
     }
     if (className.startsWith(LAMBDA_REQUEST_CLASS_PREFIX)) {
