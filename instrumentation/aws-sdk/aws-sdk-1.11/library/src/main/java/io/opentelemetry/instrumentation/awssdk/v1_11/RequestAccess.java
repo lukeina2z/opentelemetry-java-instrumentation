@@ -11,6 +11,9 @@ import java.lang.invoke.MethodType;
 import javax.annotation.Nullable;
 
 final class RequestAccess {
+  private static final String LAMBDA_REQUEST_CLASS_PREFIX = "com.amazonaws.services.lambda.model.";
+  private static final String SECRETS_MANAGER_REQUEST_CLASS_PREFIX =
+      "com.amazonaws.services.secretsmanager.model.";
 
   private static final ClassValue<RequestAccess> REQUEST_ACCESSORS =
       new ClassValue<RequestAccess>() {
@@ -45,15 +48,6 @@ final class RequestAccess {
     }
     RequestAccess access = REQUEST_ACCESSORS.get(request.getClass());
     return invokeOrNull(access.getSecretArn, request);
-  }
-
-  @Nullable
-  static String getSnsTopicArn(Object request) {
-    if (request == null) {
-      return null;
-    }
-    RequestAccess access = REQUEST_ACCESSORS.get(request.getClass());
-    return invokeOrNull(access.getSnsTopicArn, request);
   }
 
   @Nullable
@@ -106,6 +100,9 @@ final class RequestAccess {
 
   @Nullable
   static String getTopicArn(Object request) {
+    if (request == null) {
+      return null;
+    }
     RequestAccess access = REQUEST_ACCESSORS.get(request.getClass());
     return invokeOrNull(access.getTopicArn, request);
   }
@@ -128,21 +125,23 @@ final class RequestAccess {
     }
   }
 
-  @Nullable private final MethodHandle getBucketName;
-  @Nullable private final MethodHandle getQueueUrl;
-  @Nullable private final MethodHandle getQueueName;
-  @Nullable private final MethodHandle getStreamName;
-  @Nullable private final MethodHandle getTableName;
-  @Nullable private final MethodHandle getTopicArn;
-  @Nullable private final MethodHandle getTargetArn;
-  @Nullable private final MethodHandle getStateMachineArn;
-  @Nullable private final MethodHandle getStepFunctionsActivityArn;
-  @Nullable private final MethodHandle getSnsTopicArn;
-  @Nullable private final MethodHandle getSecretArn;
-  @Nullable private final MethodHandle getLambdaName;
-  @Nullable private final MethodHandle getLambdaResourceId;
+  @Nullable private MethodHandle getBucketName;
+  @Nullable private MethodHandle getQueueUrl;
+  @Nullable private MethodHandle getQueueName;
+  @Nullable private MethodHandle getStreamName;
+  @Nullable private MethodHandle getTableName;
+  @Nullable private MethodHandle getTopicArn;
+  @Nullable private MethodHandle getTargetArn;
+  @Nullable private MethodHandle getStateMachineArn;
+  @Nullable private MethodHandle getStepFunctionsActivityArn;
+  @Nullable private MethodHandle getSecretArn;
+  @Nullable private MethodHandle getLambdaName;
+  @Nullable private MethodHandle getLambdaResourceId;
 
   private RequestAccess(Class<?> clz) {
+    if (clz == null) {
+      return;
+    }
     getBucketName = findAccessorOrNull(clz, "getBucketName");
     getQueueUrl = findAccessorOrNull(clz, "getQueueUrl");
     getQueueName = findAccessorOrNull(clz, "getQueueName");
@@ -152,10 +151,14 @@ final class RequestAccess {
     getTargetArn = findAccessorOrNull(clz, "getTargetArn");
     getStateMachineArn = findAccessorOrNull(clz, "getStateMachineArn");
     getStepFunctionsActivityArn = findAccessorOrNull(clz, "getActivityArn");
-    getSnsTopicArn = findAccessorOrNull(clz, "getTopicArn");
-    getSecretArn = findAccessorOrNull(clz, "getARN");
-    getLambdaName = findAccessorOrNull(clz, "getFunctionName");
-    getLambdaResourceId = findAccessorOrNull(clz, "getUUID");
+    String className = clz.getName();
+    if (className.startsWith(SECRETS_MANAGER_REQUEST_CLASS_PREFIX)) {
+      getSecretArn = findAccessorOrNull(clz, "getARN");
+    }
+    if (className.startsWith(LAMBDA_REQUEST_CLASS_PREFIX)) {
+      getLambdaName = findAccessorOrNull(clz, "getFunctionName");
+      getLambdaResourceId = findAccessorOrNull(clz, "getUUID");
+    }
   }
 
   @Nullable

@@ -5,7 +5,9 @@
 
 package io.opentelemetry.instrumentation.awssdk.v1_11;
 
-import static java.util.Collections.singletonMap;
+import static io.opentelemetry.api.common.AttributeKey.stringKey;
+import static io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.equalTo;
+import static java.util.Collections.singletonList;
 
 import com.amazonaws.services.lambda.AWSLambda;
 import com.amazonaws.services.lambda.AWSLambdaClientBuilder;
@@ -58,12 +60,12 @@ public abstract class AbstractLambdaClientTest extends AbstractBaseAwsClientTest
     return Stream.of(
         Arguments.of(
             "GetEventSourceMapping",
-            singletonMap("aws.lambda.resource_mapping.id", "uuid"),
+            singletonList(equalTo(stringKey("aws.lambda.resource_mapping.id"), "uuid")),
             (Function<AWSLambda, Object>)
                 c -> c.getEventSourceMapping(new GetEventSourceMappingRequest().withUUID("uuid"))),
         Arguments.of(
             "GetFunction",
-            singletonMap("aws.lambda.function.name", "functionName"),
+            singletonList(equalTo(stringKey("aws.lambda.function.name"), "functionName")),
             (Function<AWSLambda, Object>)
                 c -> c.getFunction(new GetFunctionRequest().withFunctionName("functionName"))));
   }

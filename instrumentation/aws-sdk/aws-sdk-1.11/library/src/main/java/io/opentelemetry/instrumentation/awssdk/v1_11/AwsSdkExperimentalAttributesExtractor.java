@@ -48,8 +48,7 @@ class AwsSdkExperimentalAttributesExtractor
         AWS_STEP_FUNCTIONS_ACTIVITY_ARN,
         originalRequest,
         RequestAccess::getStepFunctionsActivityArn);
-    setRequestAttribute(
-        attributes, AWS_SNS_TOPIC_ARN, originalRequest, RequestAccess::getSnsTopicArn);
+    setRequestAttribute(attributes, AWS_SNS_TOPIC_ARN, originalRequest, RequestAccess::getTopicArn);
     setRequestAttribute(attributes, AWS_SECRET_ARN, originalRequest, RequestAccess::getSecretArn);
     setRequestAttribute(attributes, AWS_LAMBDA_NAME, originalRequest, RequestAccess::getLambdaName);
     setRequestAttribute(
@@ -83,7 +82,7 @@ class AwsSdkExperimentalAttributesExtractor
           AWS_STEP_FUNCTIONS_ACTIVITY_ARN,
           awsResp,
           RequestAccess::getStepFunctionsActivityArn);
-      setRequestAttribute(attributes, AWS_SNS_TOPIC_ARN, awsResp, RequestAccess::getSnsTopicArn);
+      setRequestAttribute(attributes, AWS_SNS_TOPIC_ARN, awsResp, RequestAccess::getTopicArn);
       setRequestAttribute(attributes, AWS_SECRET_ARN, awsResp, RequestAccess::getSecretArn);
     }
   }

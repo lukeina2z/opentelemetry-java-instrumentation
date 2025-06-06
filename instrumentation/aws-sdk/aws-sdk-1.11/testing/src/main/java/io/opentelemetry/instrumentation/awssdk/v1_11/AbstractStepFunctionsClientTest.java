@@ -5,7 +5,9 @@
 
 package io.opentelemetry.instrumentation.awssdk.v1_11;
 
-import static java.util.Collections.singletonMap;
+import static io.opentelemetry.api.common.AttributeKey.stringKey;
+import static io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.equalTo;
+import static java.util.Collections.singletonList;
 
 import com.amazonaws.services.stepfunctions.AWSStepFunctions;
 import com.amazonaws.services.stepfunctions.AWSStepFunctionsClientBuilder;
@@ -59,14 +61,14 @@ public abstract class AbstractStepFunctionsClientTest extends AbstractBaseAwsCli
     return Stream.of(
         Arguments.of(
             "DescribeStateMachine",
-            singletonMap("aws.stepfunctions.state_machine.arn", "stateMachineArn"),
+            singletonList(equalTo(stringKey("aws.stepfunctions.state_machine.arn"), "stateMachineArn")),
             (Function<AWSStepFunctions, Object>)
                 c ->
                     c.describeStateMachine(
                         new DescribeStateMachineRequest().withStateMachineArn("stateMachineArn"))),
         Arguments.of(
             "DescribeActivity",
-            singletonMap("aws.stepfunctions.activity.arn", "activityArn"),
+            singletonList(equalTo(stringKey("aws.stepfunctions.activity.arn"), "activityArn")),
             (Function<AWSStepFunctions, Object>)
                 c ->
                     c.describeActivity(

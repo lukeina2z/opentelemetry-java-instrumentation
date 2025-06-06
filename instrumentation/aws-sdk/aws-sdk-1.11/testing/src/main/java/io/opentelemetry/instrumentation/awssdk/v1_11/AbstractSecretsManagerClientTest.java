@@ -26,7 +26,7 @@ public abstract class AbstractSecretsManagerClientTest extends AbstractBaseAwsCl
 
   @Override
   protected boolean hasRequestId() {
-    return true;
+    return false;
   }
 
   @Test
