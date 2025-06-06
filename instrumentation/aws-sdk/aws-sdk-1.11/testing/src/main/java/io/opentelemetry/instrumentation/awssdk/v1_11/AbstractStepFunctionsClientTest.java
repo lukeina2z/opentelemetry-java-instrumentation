@@ -61,7 +61,8 @@ public abstract class AbstractStepFunctionsClientTest extends AbstractBaseAwsCli
     return Stream.of(
         Arguments.of(
             "DescribeStateMachine",
-            singletonList(equalTo(stringKey("aws.stepfunctions.state_machine.arn"), "stateMachineArn")),
+            singletonList(
+                equalTo(stringKey("aws.stepfunctions.state_machine.arn"), "stateMachineArn")),
             (Function<AWSStepFunctions, Object>)
                 c ->
                     c.describeStateMachine(
