@@ -8,12 +8,14 @@ package io.opentelemetry.instrumentation.awssdk.v2_2.internal;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_BUCKET_NAME;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_QUEUE_NAME;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_QUEUE_URL;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_SECRET_ARN;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_SNS_TOPIC_ARN;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_STATE_MACHINE_ARN;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_STEP_FUNCTIONS_ACTIVITY_ARN;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_STREAM_NAME;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_TABLE_NAME;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.FieldMapping.request;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.FieldMapping.response;
 
 import io.opentelemetry.api.common.AttributeKey;
 import java.util.Collections;
@@ -36,7 +38,9 @@ enum AwsSdkRequestType {
 
   STEPFUNCTIONS(
       request(AWS_STATE_MACHINE_ARN.getKey(), "stateMachineArn"),
-      request(AWS_STEP_FUNCTIONS_ACTIVITY_ARN.getKey(), "activityArn"));
+      request(AWS_STEP_FUNCTIONS_ACTIVITY_ARN.getKey(), "activityArn")),
+
+  SECRETSMANAGER(response(AWS_SECRET_ARN.getKey(), "ARN"));
 
   // Wrapping in unmodifiableMap
   @SuppressWarnings("ImmutableEnumChecker")
