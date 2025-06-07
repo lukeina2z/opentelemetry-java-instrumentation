@@ -197,6 +197,7 @@ public abstract class AbstractAws2ClientTest extends AbstractAws2ClientCoreTest 
 
     if (service.equals("Sns")) {
       attributes.add(equalTo(MESSAGING_DESTINATION_NAME, "somearn"));
+      attributes.add(equalTo(stringKey("aws.sns.topic.arn"), "somearn"));
     }
 
     if (service.equals("Sqs") && operation.equals("CreateQueue")) {
