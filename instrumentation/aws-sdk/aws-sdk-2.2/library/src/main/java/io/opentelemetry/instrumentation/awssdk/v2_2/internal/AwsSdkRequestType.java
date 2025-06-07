@@ -5,6 +5,14 @@
 
 package io.opentelemetry.instrumentation.awssdk.v2_2.internal;
 
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_BUCKET_NAME;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_QUEUE_NAME;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_QUEUE_URL;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_SNS_TOPIC_ARN;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_STATE_MACHINE_ARN;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_STEP_FUNCTIONS_ACTIVITY_ARN;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_STREAM_NAME;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_TABLE_NAME;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.FieldMapping.request;
 
 import io.opentelemetry.api.common.AttributeKey;
@@ -13,17 +21,22 @@ import java.util.List;
 import java.util.Map;
 
 enum AwsSdkRequestType {
-  S3(request("aws.bucket.name", "Bucket")),
-  SQS(request("aws.queue.url", "QueueUrl"), request("aws.queue.name", "QueueName")),
-  KINESIS(request("aws.stream.name", "StreamName")),
-  DYNAMODB(request("aws.table.name", "TableName")),
+  S3(request(AWS_BUCKET_NAME.getKey(), "Bucket")),
+  SQS(request(AWS_QUEUE_URL.getKey(), "QueueUrl"), request(AWS_QUEUE_NAME.getKey(), "QueueName")),
+  KINESIS(request(AWS_STREAM_NAME.getKey(), "StreamName")),
+  DYNAMODB(request(AWS_TABLE_NAME.getKey(), "TableName")),
   BEDROCK_RUNTIME(),
   SNS(
       /*
        * Only one of TopicArn and TargetArn are permitted on an SNS request.
        */
       request(AttributeKeys.MESSAGING_DESTINATION_NAME.getKey(), "TargetArn"),
-      request(AttributeKeys.MESSAGING_DESTINATION_NAME.getKey(), "TopicArn"));
+      request(AttributeKeys.MESSAGING_DESTINATION_NAME.getKey(), "TopicArn"),
+      request(AWS_SNS_TOPIC_ARN.getKey(), "TopicArn")),
+
+  STEPFUNCTIONS(
+      request(AWS_STATE_MACHINE_ARN.getKey(), "stateMachineArn"),
+      request(AWS_STEP_FUNCTIONS_ACTIVITY_ARN.getKey(), "activityArn"));
 
   // Wrapping in unmodifiableMap
   @SuppressWarnings("ImmutableEnumChecker")
