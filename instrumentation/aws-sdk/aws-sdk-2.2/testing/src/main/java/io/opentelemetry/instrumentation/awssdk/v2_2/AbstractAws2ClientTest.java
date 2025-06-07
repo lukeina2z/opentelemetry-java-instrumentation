@@ -79,6 +79,12 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3ClientBuilder;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.sfn.SfnAsyncClient;
+import software.amazon.awssdk.services.sfn.SfnAsyncClientBuilder;
+import software.amazon.awssdk.services.sfn.SfnClient;
+import software.amazon.awssdk.services.sfn.SfnClientBuilder;
+import software.amazon.awssdk.services.sfn.model.DescribeActivityRequest;
+import software.amazon.awssdk.services.sfn.model.DescribeStateMachineRequest;
 import software.amazon.awssdk.services.sns.SnsAsyncClient;
 import software.amazon.awssdk.services.sns.SnsAsyncClientBuilder;
 import software.amazon.awssdk.services.sns.SnsClient;
@@ -90,6 +96,12 @@ import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.SqsClientBuilder;
 import software.amazon.awssdk.services.sqs.model.CreateQueueRequest;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
+
+// import software.amazon.awssdk.services.lambda.LambdaClient;
+// import software.amazon.awssdk.services.lambda.model.GetFunctionRequest;
+// import software.amazon.awssdk.services.lambda.model.GetEventSourceMappingRequest;
+// import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
+// import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRequest;
 
 @SuppressWarnings("deprecation") // We need to use deprecated APIs for testing older versions.
 public abstract class AbstractAws2ClientTest extends AbstractAws2ClientCoreTest {
@@ -213,6 +225,15 @@ public abstract class AbstractAws2ClientTest extends AbstractAws2ClientCoreTest 
                   equalTo(MESSAGING_OPERATION, "publish"),
                   satisfies(MESSAGING_MESSAGE_ID, val -> val.isInstanceOf(String.class)),
                   equalTo(MESSAGING_SYSTEM, AWS_SQS))));
+    }
+
+    if (service.equals("Sfn")) {
+      if (operation.equals("DescribeStateMachine")) {
+        attributes.add(
+            equalTo(stringKey("aws.stepfunctions.state_machine.arn"), "stateMachineArn"));
+      } else if (operation.equals("DescribeActivity")) {
+        attributes.add(equalTo(stringKey("aws.stepfunctions.activity.arn"), "activityArn"));
+      }
     }
 
     String evaluatedOperation;
@@ -722,5 +743,75 @@ public abstract class AbstractAws2ClientTest extends AbstractAws2ClientCoreTest 
         .isInstanceOf(SdkException.class);
 
     assertThat(Context.current()).isEqualTo(Context.root());
+  }
+
+  private static Stream<Arguments> provideStepFunctionsArguments() {
+    return Stream.of(
+        Arguments.of(
+            (Function<SfnClient, Object>)
+                c ->
+                    c.describeStateMachine(
+                        DescribeStateMachineRequest.builder()
+                            .stateMachineArn("stateMachineArn")
+                            .build()),
+            "DescribeStateMachine",
+            "POST",
+            "UNKNOWN"),
+        Arguments.of(
+            (Function<SfnClient, Object>)
+                c ->
+                    c.describeActivity(
+                        DescribeActivityRequest.builder().activityArn("activityArn").build()),
+            "DescribeActivity",
+            "POST",
+            "UNKNOWN"));
+  }
+
+  @ParameterizedTest
+  @MethodSource("provideStepFunctionsArguments")
+  void testSfnSendOperationRequestWithBuilder(
+      Function<SfnClient, Object> call, String operation, String method, String requestId) {
+    SfnClientBuilder builder = SfnClient.builder();
+    configureSdkClient(builder);
+    SfnClient client =
+        builder
+            .endpointOverride(clientUri)
+            .region(Region.AP_NORTHEAST_1)
+            .credentialsProvider(CREDENTIALS_PROVIDER)
+            .build();
+
+    server.enqueue(HttpResponse.of(HttpStatus.OK, MediaType.PLAIN_TEXT_UTF_8, ""));
+    Object response = call.apply(client);
+    assertThat(response.getClass().getSimpleName())
+        .satisfiesAnyOf(
+            v -> assertThat(v).startsWith("Describe"),
+            v ->
+                assertThat(response)
+                    .isInstanceOf(software.amazon.awssdk.services.sfn.model.SfnResponse.class));
+    clientAssertions("Sfn", operation, method, response, requestId);
+  }
+
+  @ParameterizedTest
+  @MethodSource("provideStepFunctionsArguments")
+  void testSfnAsyncSendOperationRequestWithBuilder(
+      Function<SfnClient, Object> call, String operation, String method, String requestId) {
+    SfnAsyncClientBuilder builder = SfnAsyncClient.builder();
+    configureSdkClient(builder);
+    SfnAsyncClient client =
+        builder
+            .endpointOverride(clientUri)
+            .region(Region.AP_NORTHEAST_1)
+            .credentialsProvider(CREDENTIALS_PROVIDER)
+            .build();
+
+    server.enqueue(HttpResponse.of(HttpStatus.OK, MediaType.PLAIN_TEXT_UTF_8, ""));
+    Object response = call.apply(wrapClient(SfnClient.class, SfnAsyncClient.class, client));
+    assertThat(response.getClass().getSimpleName())
+        .satisfiesAnyOf(
+            v -> assertThat(v).startsWith("Describe"),
+            v ->
+                assertThat(response)
+                    .isInstanceOf(software.amazon.awssdk.services.sfn.model.SfnResponse.class));
+    clientAssertions("Sfn", operation, method, response, requestId);
   }
 }
