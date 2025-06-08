@@ -40,7 +40,7 @@ enum AwsSdkRequestType {
       request(AttributeKeys.MESSAGING_DESTINATION_NAME.getKey(), "TopicArn"),
       request(AWS_SNS_TOPIC_ARN.getKey(), "TopicArn")),
 
-  STEPFUNCTION(
+  STEPFUNCTIONS(
       request(AWS_STATE_MACHINE_ARN.getKey(), "stateMachineArn"),
       request(AWS_STEP_FUNCTIONS_ACTIVITY_ARN.getKey(), "activityArn")),
 
