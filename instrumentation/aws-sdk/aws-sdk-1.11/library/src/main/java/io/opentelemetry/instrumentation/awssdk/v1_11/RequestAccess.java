@@ -114,16 +114,17 @@ final class RequestAccess {
   }
 
   @Nullable private MethodHandle getBucketName;
+  @Nullable private MethodHandle getLambdaName;
+  @Nullable private MethodHandle getLambdaResourceId;
   @Nullable private MethodHandle getQueueUrl;
   @Nullable private MethodHandle getQueueName;
+
+  @Nullable private MethodHandle getStateMachineArn;
+  @Nullable private MethodHandle getStepFunctionsActivityArn;
   @Nullable private MethodHandle getStreamName;
   @Nullable private MethodHandle getTableName;
   @Nullable private MethodHandle getTopicArn;
   @Nullable private MethodHandle getTargetArn;
-  @Nullable private MethodHandle getStateMachineArn;
-  @Nullable private MethodHandle getStepFunctionsActivityArn;
-  @Nullable private MethodHandle getLambdaName;
-  @Nullable private MethodHandle getLambdaResourceId;
 
   private RequestAccess(Class<?> clz) {
     if (clz == null) {
