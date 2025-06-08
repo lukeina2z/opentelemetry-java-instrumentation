@@ -11,6 +11,7 @@ import java.lang.invoke.MethodType;
 import javax.annotation.Nullable;
 
 final class RequestAccess {
+  private static final String LAMBDA_REQUEST_CLASS_PREFIX = "com.amazonaws.services.lambda.model.";
   private static final String STEP_FUNCTIONS_REQUEST_CLASS_PREFIX =
       "com.amazonaws.services.stepfunctions.model.";
 
@@ -21,6 +22,24 @@ final class RequestAccess {
           return new RequestAccess(type);
         }
       };
+
+  @Nullable
+  static String getLambdaName(Object request) {
+    if (request == null) {
+      return null;
+    }
+    RequestAccess access = REQUEST_ACCESSORS.get(request.getClass());
+    return invokeOrNull(access.getLambdaName, request);
+  }
+
+  @Nullable
+  static String getLambdaResourceId(Object request) {
+    if (request == null) {
+      return null;
+    }
+    RequestAccess access = REQUEST_ACCESSORS.get(request.getClass());
+    return invokeOrNull(access.getLambdaResourceId, request);
+  }
 
   @Nullable
   static String getStepFunctionsActivityArn(Object request) {
@@ -103,6 +122,8 @@ final class RequestAccess {
   @Nullable private MethodHandle getTargetArn;
   @Nullable private MethodHandle getStateMachineArn;
   @Nullable private MethodHandle getStepFunctionsActivityArn;
+  @Nullable private MethodHandle getLambdaName;
+  @Nullable private MethodHandle getLambdaResourceId;
 
   private RequestAccess(Class<?> clz) {
     if (clz == null) {
@@ -116,7 +137,10 @@ final class RequestAccess {
     getTopicArn = findAccessorOrNull(clz, "getTopicArn");
     getTargetArn = findAccessorOrNull(clz, "getTargetArn");
     String className = clz.getName();
-    if (className.startsWith(STEP_FUNCTIONS_REQUEST_CLASS_PREFIX)) {
+    if (className.startsWith(LAMBDA_REQUEST_CLASS_PREFIX)) {
+      getLambdaName = findAccessorOrNull(clz, "getFunctionName");
+      getLambdaResourceId = findAccessorOrNull(clz, "getUUID");
+    } else if (className.startsWith(STEP_FUNCTIONS_REQUEST_CLASS_PREFIX)) {
       getStateMachineArn = findAccessorOrNull(clz, "getStateMachineArn");
       getStepFunctionsActivityArn = findAccessorOrNull(clz, "getActivityArn");
     }

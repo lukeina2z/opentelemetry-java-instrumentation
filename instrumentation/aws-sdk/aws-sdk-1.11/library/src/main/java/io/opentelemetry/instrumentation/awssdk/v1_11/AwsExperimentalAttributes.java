@@ -20,6 +20,9 @@ final class AwsExperimentalAttributes {
       stringKey("aws.stepfunctions.state_machine.arn");
   static final AttributeKey<String> AWS_STEP_FUNCTIONS_ACTIVITY_ARN =
       stringKey("aws.stepfunctions.activity.arn");
+  static final AttributeKey<String> AWS_LAMBDA_NAME = stringKey("aws.lambda.function.name");
+  static final AttributeKey<String> AWS_LAMBDA_RESOURCE_ID =
+      stringKey("aws.lambda.resource_mapping.id");
 
   private AwsExperimentalAttributes() {}
 }
