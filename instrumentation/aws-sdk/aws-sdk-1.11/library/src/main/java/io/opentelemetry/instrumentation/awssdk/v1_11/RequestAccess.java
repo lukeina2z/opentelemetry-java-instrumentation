@@ -14,6 +14,8 @@ final class RequestAccess {
   private static final String LAMBDA_REQUEST_CLASS_PREFIX = "com.amazonaws.services.lambda.model.";
   private static final String SECRETS_MANAGER_REQUEST_CLASS_PREFIX =
       "com.amazonaws.services.secretsmanager.model.";
+  private static final String STEP_FUNCTIONS_REQUEST_CLASS_PREFIX =
+      "com.amazonaws.services.stepfunctions.model.";
 
   private static final ClassValue<RequestAccess> REQUEST_ACCESSORS =
       new ClassValue<RequestAccess>() {
@@ -149,15 +151,17 @@ final class RequestAccess {
     getTableName = findAccessorOrNull(clz, "getTableName");
     getTopicArn = findAccessorOrNull(clz, "getTopicArn");
     getTargetArn = findAccessorOrNull(clz, "getTargetArn");
-    getStateMachineArn = findAccessorOrNull(clz, "getStateMachineArn");
-    getStepFunctionsActivityArn = findAccessorOrNull(clz, "getActivityArn");
     String className = clz.getName();
-    if (className.startsWith(SECRETS_MANAGER_REQUEST_CLASS_PREFIX)) {
-      getSecretArn = findAccessorOrNull(clz, "getARN");
-    }
     if (className.startsWith(LAMBDA_REQUEST_CLASS_PREFIX)) {
       getLambdaName = findAccessorOrNull(clz, "getFunctionName");
       getLambdaResourceId = findAccessorOrNull(clz, "getUUID");
+    }
+    if (className.startsWith(SECRETS_MANAGER_REQUEST_CLASS_PREFIX)) {
+      getSecretArn = findAccessorOrNull(clz, "getARN");
+    }
+    if (className.startsWith(STEP_FUNCTIONS_REQUEST_CLASS_PREFIX)) {
+      getStateMachineArn = findAccessorOrNull(clz, "getStateMachineArn");
+      getStepFunctionsActivityArn = findAccessorOrNull(clz, "getActivityArn");
     }
   }
 
