@@ -31,7 +31,7 @@ public abstract class AbstractSnsClientTest extends AbstractBaseAwsClientTest {
   }
 
   @Test
-  public void testSendRequestWithwithTargetArnMockedResponse() throws Exception {
+  public void testSendRequestWithTargetArnAndMockedResponse() throws Exception {
     AmazonSNSClientBuilder clientBuilder = AmazonSNSClientBuilder.standard();
     AmazonSNS client =
         configureClient(clientBuilder)
@@ -51,16 +51,17 @@ public abstract class AbstractSnsClientTest extends AbstractBaseAwsClientTest {
 
     server.enqueue(HttpResponse.of(HttpStatus.OK, MediaType.PLAIN_TEXT_UTF_8, body));
     List<AttributeAssertion> additionalAttributes =
-        singletonList(equalTo(MESSAGING_DESTINATION_NAME, "somearn"));
+        singletonList(equalTo(MESSAGING_DESTINATION_NAME, "target-arn-foo"));
 
     Object response =
-        client.publish(new PublishRequest().withMessage("somemessage").withTargetArn("somearn"));
+        client.publish(
+            new PublishRequest().withMessage("somemessage").withTargetArn("target-arn-foo"));
     assertRequestWithMockedResponse(
         response, client, "SNS", "Publish", "POST", additionalAttributes);
   }
 
   @Test
-  public void testSendRequestWithwithTopicArnMockedResponse() throws Exception {
+  public void testSendRequestWithTopicArnAndMockedResponse() throws Exception {
     AmazonSNSClientBuilder clientBuilder = AmazonSNSClientBuilder.standard();
     AmazonSNS client =
         configureClient(clientBuilder)
@@ -81,11 +82,12 @@ public abstract class AbstractSnsClientTest extends AbstractBaseAwsClientTest {
     server.enqueue(HttpResponse.of(HttpStatus.OK, MediaType.PLAIN_TEXT_UTF_8, body));
     List<AttributeAssertion> additionalAttributes =
         asList(
-            equalTo(MESSAGING_DESTINATION_NAME, "somearn"),
-            equalTo(stringKey("aws.sns.topic.arn"), "somearn"));
+            equalTo(MESSAGING_DESTINATION_NAME, "topic-arn-foo"),
+            equalTo(stringKey("aws.sns.topic.arn"), "topic-arn-foo"));
 
     Object response =
-        client.publish(new PublishRequest().withMessage("somemessage").withTopicArn("somearn"));
+        client.publish(
+            new PublishRequest().withMessage("somemessage").withTopicArn("topic-arn-foo"));
 
     assertRequestWithMockedResponse(
         response, client, "SNS", "Publish", "POST", additionalAttributes);
