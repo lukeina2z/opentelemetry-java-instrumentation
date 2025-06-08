@@ -11,6 +11,7 @@ import static io.opentelemetry.instrumentation.awssdk.v1_11.AwsExperimentalAttri
 import static io.opentelemetry.instrumentation.awssdk.v1_11.AwsExperimentalAttributes.AWS_LAMBDA_RESOURCE_ID;
 import static io.opentelemetry.instrumentation.awssdk.v1_11.AwsExperimentalAttributes.AWS_QUEUE_NAME;
 import static io.opentelemetry.instrumentation.awssdk.v1_11.AwsExperimentalAttributes.AWS_QUEUE_URL;
+import static io.opentelemetry.instrumentation.awssdk.v1_11.AwsExperimentalAttributes.AWS_SNS_TOPIC_ARN;
 import static io.opentelemetry.instrumentation.awssdk.v1_11.AwsExperimentalAttributes.AWS_STATE_MACHINE_ARN;
 import static io.opentelemetry.instrumentation.awssdk.v1_11.AwsExperimentalAttributes.AWS_STEP_FUNCTIONS_ACTIVITY_ARN;
 import static io.opentelemetry.instrumentation.awssdk.v1_11.AwsExperimentalAttributes.AWS_STREAM_NAME;
@@ -46,6 +47,7 @@ class AwsSdkExperimentalAttributesExtractor
         AWS_STEP_FUNCTIONS_ACTIVITY_ARN,
         originalRequest,
         RequestAccess::getStepFunctionsActivityArn);
+    setRequestAttribute(attributes, AWS_SNS_TOPIC_ARN, originalRequest, RequestAccess::getTopicArn);
     setRequestAttribute(attributes, AWS_LAMBDA_NAME, originalRequest, RequestAccess::getLambdaName);
     setRequestAttribute(
         attributes, AWS_LAMBDA_RESOURCE_ID, originalRequest, RequestAccess::getLambdaResourceId);
@@ -78,6 +80,7 @@ class AwsSdkExperimentalAttributesExtractor
           AWS_STEP_FUNCTIONS_ACTIVITY_ARN,
           awsResp,
           RequestAccess::getStepFunctionsActivityArn);
+      setRequestAttribute(attributes, AWS_SNS_TOPIC_ARN, awsResp, RequestAccess::getTopicArn);
     }
   }
 }
