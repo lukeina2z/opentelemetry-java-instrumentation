@@ -31,7 +31,11 @@ enum AwsSdkRequestType {
   KINESIS(request(AWS_STREAM_NAME.getKey(), "StreamName")),
   DYNAMODB(request(AWS_TABLE_NAME.getKey(), "TableName")),
   BEDROCK_RUNTIME(),
-
+  LAMBDA(
+      request(AWS_LAMBDA_NAME.getKey(), "FunctionName"),
+      request(AWS_LAMBDA_RESOURCE_ID.getKey(), "UUID"),
+      response(AWS_LAMBDA_ARN.getKey(), "Configuration.FunctionArn")),
+  SECRETSMANAGER(response(AWS_SECRET_ARN.getKey(), "ARN")),
   SNS(
       /*
        * Only one of TopicArn and TargetArn are permitted on an SNS request.
@@ -39,17 +43,9 @@ enum AwsSdkRequestType {
       request(AttributeKeys.MESSAGING_DESTINATION_NAME.getKey(), "TargetArn"),
       request(AttributeKeys.MESSAGING_DESTINATION_NAME.getKey(), "TopicArn"),
       request(AWS_SNS_TOPIC_ARN.getKey(), "TopicArn")),
-
   STEPFUNCTIONS(
       request(AWS_STATE_MACHINE_ARN.getKey(), "stateMachineArn"),
-      request(AWS_STEP_FUNCTIONS_ACTIVITY_ARN.getKey(), "activityArn")),
-
-  SECRETSMANAGER(response(AWS_SECRET_ARN.getKey(), "ARN")),
-
-  LAMBDA(
-      request(AWS_LAMBDA_NAME.getKey(), "FunctionName"),
-      request(AWS_LAMBDA_RESOURCE_ID.getKey(), "UUID"),
-      response(AWS_LAMBDA_ARN.getKey(), "Configuration.FunctionArn"));
+      request(AWS_STEP_FUNCTIONS_ACTIVITY_ARN.getKey(), "activityArn"));
 
   // Wrapping in unmodifiableMap
   @SuppressWarnings("ImmutableEnumChecker")
