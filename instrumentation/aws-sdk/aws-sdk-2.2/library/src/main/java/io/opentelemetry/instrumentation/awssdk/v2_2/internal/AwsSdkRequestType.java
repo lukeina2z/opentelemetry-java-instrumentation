@@ -9,6 +9,8 @@ import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimen
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_QUEUE_NAME;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_QUEUE_URL;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_SECRET_ARN;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_STATE_MACHINE_ARN;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_STEP_FUNCTIONS_ACTIVITY_ARN;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_STREAM_NAME;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_TABLE_NAME;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.FieldMapping.request;
@@ -31,7 +33,10 @@ enum AwsSdkRequestType {
        * Only one of TopicArn and TargetArn are permitted on an SNS request.
        */
       request(AttributeKeys.MESSAGING_DESTINATION_NAME.getKey(), "TargetArn"),
-      request(AttributeKeys.MESSAGING_DESTINATION_NAME.getKey(), "TopicArn"));
+      request(AttributeKeys.MESSAGING_DESTINATION_NAME.getKey(), "TopicArn")),
+  STEPFUNCTIONS(
+      request(AWS_STATE_MACHINE_ARN.getKey(), "stateMachineArn"),
+      request(AWS_STEP_FUNCTIONS_ACTIVITY_ARN.getKey(), "activityArn"));
 
   // Wrapping in unmodifiableMap
   @SuppressWarnings("ImmutableEnumChecker")

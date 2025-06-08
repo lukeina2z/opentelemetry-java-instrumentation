@@ -12,6 +12,7 @@ import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkReques
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.SECRETSMANAGER;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.SNS;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.SQS;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.STEPFUNCTIONS;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.FieldMapping.request;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.FieldMapping.response;
 
@@ -36,6 +37,7 @@ enum AwsSdkRequest {
   SnsRequest(SNS, "SnsRequest"),
   SqsRequest(SQS, "SqsRequest"),
   KinesisRequest(KINESIS, "KinesisRequest"),
+  SfnRequest(STEPFUNCTIONS, "SfnRequest"),
   SecretsManagerRequest(SECRETSMANAGER, "SecretsManagerRequest"),
   // specific requests
   BatchGetItem(
