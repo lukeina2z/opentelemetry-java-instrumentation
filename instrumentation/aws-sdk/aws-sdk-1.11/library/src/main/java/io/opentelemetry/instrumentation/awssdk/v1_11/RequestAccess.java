@@ -12,6 +12,8 @@ import javax.annotation.Nullable;
 
 final class RequestAccess {
   private static final String LAMBDA_REQUEST_CLASS_PREFIX = "com.amazonaws.services.lambda.model.";
+  private static final String SECRETS_MANAGER_REQUEST_CLASS_PREFIX =
+      "com.amazonaws.services.secretsmanager.model.";
   private static final String STEP_FUNCTIONS_REQUEST_CLASS_PREFIX =
       "com.amazonaws.services.stepfunctions.model.";
 
@@ -39,6 +41,15 @@ final class RequestAccess {
     }
     RequestAccess access = REQUEST_ACCESSORS.get(request.getClass());
     return invokeOrNull(access.getLambdaResourceId, request);
+  }
+
+  @Nullable
+  static String getSecretArn(Object request) {
+    if (request == null) {
+      return null;
+    }
+    RequestAccess access = REQUEST_ACCESSORS.get(request.getClass());
+    return invokeOrNull(access.getSecretArn, request);
   }
 
   @Nullable
@@ -117,16 +128,17 @@ final class RequestAccess {
   }
 
   @Nullable private MethodHandle getBucketName;
+  @Nullable private MethodHandle getLambdaName;
+  @Nullable private MethodHandle getLambdaResourceId;
   @Nullable private MethodHandle getQueueUrl;
   @Nullable private MethodHandle getQueueName;
+  @Nullable private MethodHandle getSecretArn;
+  @Nullable private MethodHandle getStateMachineArn;
+  @Nullable private MethodHandle getStepFunctionsActivityArn;
   @Nullable private MethodHandle getStreamName;
   @Nullable private MethodHandle getTableName;
   @Nullable private MethodHandle getTopicArn;
   @Nullable private MethodHandle getTargetArn;
-  @Nullable private MethodHandle getStateMachineArn;
-  @Nullable private MethodHandle getStepFunctionsActivityArn;
-  @Nullable private MethodHandle getLambdaName;
-  @Nullable private MethodHandle getLambdaResourceId;
 
   private RequestAccess(Class<?> clz) {
     if (clz == null) {
@@ -143,6 +155,8 @@ final class RequestAccess {
     if (className.startsWith(LAMBDA_REQUEST_CLASS_PREFIX)) {
       getLambdaName = findAccessorOrNull(clz, "getFunctionName");
       getLambdaResourceId = findAccessorOrNull(clz, "getUUID");
+    } else if (className.startsWith(SECRETS_MANAGER_REQUEST_CLASS_PREFIX)) {
+      getSecretArn = findAccessorOrNull(clz, "getARN");
     } else if (className.startsWith(STEP_FUNCTIONS_REQUEST_CLASS_PREFIX)) {
       getStateMachineArn = findAccessorOrNull(clz, "getStateMachineArn");
       getStepFunctionsActivityArn = findAccessorOrNull(clz, "getActivityArn");
