@@ -8,6 +8,7 @@ package io.opentelemetry.instrumentation.awssdk.v2_2.internal;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.BEDROCK_RUNTIME;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.DYNAMODB;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.KINESIS;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.LAMBDA;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.S3;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.SECRETSMANAGER;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.SNS;
@@ -39,6 +40,7 @@ enum AwsSdkRequest {
   KinesisRequest(KINESIS, "KinesisRequest"),
   SfnRequest(STEPFUNCTIONS, "SfnRequest"),
   SecretsManagerRequest(SECRETSMANAGER, "SecretsManagerRequest"),
+  LambdaRequest(LAMBDA, "LambdaRequest"),
   // specific requests
   BatchGetItem(
       DYNAMODB,

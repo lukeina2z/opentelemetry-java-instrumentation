@@ -11,6 +11,10 @@ import io.opentelemetry.api.common.AttributeKey;
 
 final class AwsExperimentalAttributes {
   static final AttributeKey<String> AWS_BUCKET_NAME = stringKey("aws.bucket.name");
+  static final AttributeKey<String> AWS_LAMBDA_ARN = stringKey("aws.lambda.function.arn");
+  static final AttributeKey<String> AWS_LAMBDA_NAME = stringKey("aws.lambda.function.name");
+  static final AttributeKey<String> AWS_LAMBDA_RESOURCE_ID =
+      stringKey("aws.lambda.resource_mapping.id");
   static final AttributeKey<String> AWS_QUEUE_URL = stringKey("aws.queue.url");
   static final AttributeKey<String> AWS_QUEUE_NAME = stringKey("aws.queue.name");
   static final AttributeKey<String> AWS_SECRET_ARN = stringKey("aws.secretsmanager.secret.arn");

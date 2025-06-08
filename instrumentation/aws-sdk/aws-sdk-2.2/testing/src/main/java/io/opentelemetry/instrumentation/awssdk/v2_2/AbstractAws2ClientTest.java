@@ -68,6 +68,12 @@ import software.amazon.awssdk.services.ec2.Ec2ClientBuilder;
 import software.amazon.awssdk.services.kinesis.KinesisClient;
 import software.amazon.awssdk.services.kinesis.KinesisClientBuilder;
 import software.amazon.awssdk.services.kinesis.model.DeleteStreamRequest;
+import software.amazon.awssdk.services.lambda.LambdaAsyncClient;
+import software.amazon.awssdk.services.lambda.LambdaAsyncClientBuilder;
+import software.amazon.awssdk.services.lambda.LambdaClient;
+import software.amazon.awssdk.services.lambda.LambdaClientBuilder;
+import software.amazon.awssdk.services.lambda.model.GetEventSourceMappingRequest;
+import software.amazon.awssdk.services.lambda.model.GetFunctionRequest;
 import software.amazon.awssdk.services.rds.RdsAsyncClient;
 import software.amazon.awssdk.services.rds.RdsAsyncClientBuilder;
 import software.amazon.awssdk.services.rds.RdsClient;
@@ -252,6 +258,15 @@ public abstract class AbstractAws2ClientTest extends AbstractAws2ClientCoreTest 
           equalTo(
               stringKey("aws.secretsmanager.secret.arn"),
               "arn:aws:secretsmanager:us-east-1:123456789012:secret:MySecretFromCLI-sNkBwD"));
+    }
+
+    if (service.equals("Lambda")) {
+      if (operation.equals("GetFunction")) {
+        attributes.add(equalTo(stringKey("aws.lambda.function.name"), "lambda-function-name-foo"));
+      } else if (operation.equals("GetEventSourceMapping")) {
+        attributes.add(
+            equalTo(stringKey("aws.lambda.resource_mapping.id"), "lambda-resource-id-foo"));
+      }
     }
 
     String evaluatedOperation;
@@ -871,5 +886,79 @@ public abstract class AbstractAws2ClientTest extends AbstractAws2ClientCoreTest 
     Object response =
         client.getSecretValue(GetSecretValueRequest.builder().secretId("MySecretFromCLI").build());
     clientAssertions("SecretsManager", "GetSecretValue", "POST", response, "UNKNOWN");
+  }
+
+  private static Stream<Arguments> provideLambdaArguments() {
+    return Stream.of(
+        Arguments.of(
+            (Function<LambdaClient, Object>)
+                c ->
+                    c.getFunction(
+                        GetFunctionRequest.builder()
+                            .functionName("lambda-function-name-foo")
+                            .build()),
+            "GetFunction",
+            "GET",
+            "UNKNOWN"),
+        Arguments.of(
+            (Function<LambdaClient, Object>)
+                c ->
+                    c.getEventSourceMapping(
+                        GetEventSourceMappingRequest.builder()
+                            .uuid("lambda-resource-id-foo")
+                            .build()),
+            "GetEventSourceMapping",
+            "GET",
+            "UNKNOWN"));
+  }
+
+  @ParameterizedTest
+  @MethodSource("provideLambdaArguments")
+  void testLambdaSendOperationRequestWithBuilder(
+      Function<LambdaClient, Object> call, String operation, String method, String requestId) {
+    LambdaClientBuilder builder = LambdaClient.builder();
+    configureSdkClient(builder);
+    LambdaClient client =
+        builder
+            .endpointOverride(clientUri)
+            .region(Region.AP_NORTHEAST_1)
+            .credentialsProvider(CREDENTIALS_PROVIDER)
+            .build();
+
+    server.enqueue(HttpResponse.of(HttpStatus.OK, MediaType.PLAIN_TEXT_UTF_8, ""));
+    Object response = call.apply(client);
+    assertThat(response.getClass().getSimpleName())
+        .satisfiesAnyOf(
+            v -> assertThat(v).endsWith("Response"),
+            v ->
+                assertThat(response)
+                    .isInstanceOf(
+                        software.amazon.awssdk.services.lambda.model.LambdaResponse.class));
+    clientAssertions("Lambda", operation, method, response, requestId);
+  }
+
+  @ParameterizedTest
+  @MethodSource("provideLambdaArguments")
+  void testLambdaAsyncSendOperationRequestWithBuilder(
+      Function<LambdaClient, Object> call, String operation, String method, String requestId) {
+    LambdaAsyncClientBuilder builder = LambdaAsyncClient.builder();
+    configureSdkClient(builder);
+    LambdaAsyncClient client =
+        builder
+            .endpointOverride(clientUri)
+            .region(Region.AP_NORTHEAST_1)
+            .credentialsProvider(CREDENTIALS_PROVIDER)
+            .build();
+
+    server.enqueue(HttpResponse.of(HttpStatus.OK, MediaType.PLAIN_TEXT_UTF_8, ""));
+    Object response = call.apply(wrapClient(LambdaClient.class, LambdaAsyncClient.class, client));
+    assertThat(response.getClass().getSimpleName())
+        .satisfiesAnyOf(
+            v -> assertThat(v).endsWith("Response"),
+            v ->
+                assertThat(response)
+                    .isInstanceOf(
+                        software.amazon.awssdk.services.lambda.model.LambdaResponse.class));
+    clientAssertions("Lambda", operation, method, response, requestId);
   }
 }

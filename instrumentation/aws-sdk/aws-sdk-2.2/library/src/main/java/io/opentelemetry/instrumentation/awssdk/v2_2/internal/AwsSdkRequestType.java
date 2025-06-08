@@ -6,6 +6,9 @@
 package io.opentelemetry.instrumentation.awssdk.v2_2.internal;
 
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_BUCKET_NAME;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_LAMBDA_ARN;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_LAMBDA_NAME;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_LAMBDA_RESOURCE_ID;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_QUEUE_NAME;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_QUEUE_URL;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.AWS_SECRET_ARN;
@@ -27,6 +30,10 @@ enum AwsSdkRequestType {
   KINESIS(request(AWS_STREAM_NAME.getKey(), "StreamName")),
   DYNAMODB(request(AWS_TABLE_NAME.getKey(), "TableName")),
   BEDROCK_RUNTIME(),
+  LAMBDA(
+      request(AWS_LAMBDA_NAME.getKey(), "FunctionName"),
+      request(AWS_LAMBDA_RESOURCE_ID.getKey(), "UUID"),
+      response(AWS_LAMBDA_ARN.getKey(), "Configuration.FunctionArn")),
   SECRETSMANAGER(response(AWS_SECRET_ARN.getKey(), "ARN")),
   SNS(
       /*
