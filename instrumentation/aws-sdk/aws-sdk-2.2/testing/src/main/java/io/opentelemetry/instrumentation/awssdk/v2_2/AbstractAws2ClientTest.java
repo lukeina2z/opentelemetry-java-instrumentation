@@ -817,10 +817,15 @@ public abstract class AbstractAws2ClientTest extends AbstractAws2ClientCoreTest 
     Object response = call.apply(client);
     assertThat(response.getClass().getSimpleName())
         .satisfiesAnyOf(
-            v -> assertThat(v).startsWith("Describe"),
             v ->
                 assertThat(response)
-                    .isInstanceOf(software.amazon.awssdk.services.sfn.model.SfnResponse.class));
+                    .isInstanceOf(
+                        software.amazon.awssdk.services.sfn.model.DescribeActivityResponse.class),
+            v ->
+                assertThat(response)
+                    .isInstanceOf(
+                        software.amazon.awssdk.services.sfn.model.DescribeStateMachineResponse
+                            .class));
     clientAssertions("Sfn", operation, method, response, requestId);
   }
 
@@ -841,10 +846,15 @@ public abstract class AbstractAws2ClientTest extends AbstractAws2ClientCoreTest 
     Object response = call.apply(wrapClient(SfnClient.class, SfnAsyncClient.class, client));
     assertThat(response.getClass().getSimpleName())
         .satisfiesAnyOf(
-            v -> assertThat(v).startsWith("Describe"),
             v ->
                 assertThat(response)
-                    .isInstanceOf(software.amazon.awssdk.services.sfn.model.SfnResponse.class));
+                    .isInstanceOf(
+                        software.amazon.awssdk.services.sfn.model.DescribeActivityResponse.class),
+            v ->
+                assertThat(response)
+                    .isInstanceOf(
+                        software.amazon.awssdk.services.sfn.model.DescribeStateMachineResponse
+                            .class));
     clientAssertions("Sfn", operation, method, response, requestId);
   }
 
@@ -864,8 +874,8 @@ public abstract class AbstractAws2ClientTest extends AbstractAws2ClientCoreTest 
     Object response =
         client.getSecretValue(GetSecretValueRequest.builder().secretId("MySecretFromCLI").build());
     assertThat(response.getClass().getSimpleName())
-        .satisfiesAnyOf(
-            v -> assertThat(v).startsWith("GetSecretValueResponse"),
+        .satisfies(
+            v -> assertThat(v).isEqualTo("GetSecretValueResponse"),
             v -> assertThat(response).isInstanceOf(GetSecretValueResponse.class));
     clientAssertions("SecretsManager", "GetSecretValue", "POST", response, "UNKNOWN");
   }
@@ -929,11 +939,15 @@ public abstract class AbstractAws2ClientTest extends AbstractAws2ClientCoreTest 
     Object response = call.apply(client);
     assertThat(response.getClass().getSimpleName())
         .satisfiesAnyOf(
-            v -> assertThat(v).endsWith("Response"),
             v ->
                 assertThat(response)
                     .isInstanceOf(
-                        software.amazon.awssdk.services.lambda.model.LambdaResponse.class));
+                        software.amazon.awssdk.services.lambda.model.GetFunctionResponse.class),
+            v ->
+                assertThat(response)
+                    .isInstanceOf(
+                        software.amazon.awssdk.services.lambda.model.GetEventSourceMappingResponse
+                            .class));
     clientAssertions("Lambda", operation, method, response, requestId);
   }
 
@@ -954,11 +968,15 @@ public abstract class AbstractAws2ClientTest extends AbstractAws2ClientCoreTest 
     Object response = call.apply(wrapClient(LambdaClient.class, LambdaAsyncClient.class, client));
     assertThat(response.getClass().getSimpleName())
         .satisfiesAnyOf(
-            v -> assertThat(v).endsWith("Response"),
             v ->
                 assertThat(response)
                     .isInstanceOf(
-                        software.amazon.awssdk.services.lambda.model.LambdaResponse.class));
+                        software.amazon.awssdk.services.lambda.model.GetFunctionResponse.class),
+            v ->
+                assertThat(response)
+                    .isInstanceOf(
+                        software.amazon.awssdk.services.lambda.model.GetEventSourceMappingResponse
+                            .class));
     clientAssertions("Lambda", operation, method, response, requestId);
   }
 }
