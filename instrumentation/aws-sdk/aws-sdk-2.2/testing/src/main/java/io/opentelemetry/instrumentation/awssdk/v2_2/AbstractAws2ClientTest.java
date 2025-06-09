@@ -102,6 +102,9 @@ import software.amazon.awssdk.services.sns.SnsAsyncClientBuilder;
 import software.amazon.awssdk.services.sns.SnsClient;
 import software.amazon.awssdk.services.sns.SnsClientBuilder;
 import software.amazon.awssdk.services.sns.model.PublishRequest;
+import software.amazon.awssdk.services.sns.model.PublishResponse;
+import software.amazon.awssdk.services.sns.model.SubscribeRequest;
+import software.amazon.awssdk.services.sns.model.SubscribeResponse;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 import software.amazon.awssdk.services.sqs.SqsAsyncClientBuilder;
 import software.amazon.awssdk.services.sqs.SqsClient;
@@ -141,6 +144,26 @@ public abstract class AbstractAws2ClientTest extends AbstractAws2ClientCoreTest 
           + "    ],"
           + "    \"CreatedDate\": \"1.523477145713E9\""
           + "}";
+
+  private static final String snsPublishResponseBody =
+      "<PublishResponse xmlns=\"https://sns.amazonaws.com/doc/2010-03-31/\">"
+          + "    <PublishResult>"
+          + "        <MessageId>567910cd-659e-55d4-8ccb-5aaf14679dc0</MessageId>"
+          + "    </PublishResult>"
+          + "    <ResponseMetadata>"
+          + "        <RequestId>d74b8436-ae13-5ab4-a9ff-ce54dfea72a0</RequestId>"
+          + "    </ResponseMetadata>"
+          + "</PublishResponse>";
+
+  private static final String snsSubscribeResponseBody =
+      "<SubscribeResponse xmlns=\"https://sns.amazonaws.com/doc/2010-03-31/\">"
+          + "   <SubscribeResult>"
+          + "       <SubscriptionArn>arn:aws:sns:us-west-2:123456789012:MyTopic:abc123</SubscriptionArn>"
+          + "   </SubscribeResult>"
+          + "   <ResponseMetadata>"
+          + "       <RequestId>0ac9cda2-abcd-11d3-f92b-31fa5e8dbc67</RequestId>"
+          + "   </ResponseMetadata>"
+          + " </SubscribeResponse>";
 
   private static void assumeSupportedConfig(String operation) {
     Assumptions.assumeFalse(
@@ -226,8 +249,12 @@ public abstract class AbstractAws2ClientTest extends AbstractAws2ClientCoreTest 
     }
 
     if (service.equals("Sns")) {
-      attributes.add(equalTo(MESSAGING_DESTINATION_NAME, "somearn"));
-      attributes.add(equalTo(stringKey("aws.sns.topic.arn"), "somearn"));
+      if (operation.equals("Publish")) {
+        attributes.add(equalTo(MESSAGING_DESTINATION_NAME, "sns-target-arn"));
+      } else if (operation.equals("Subscribe")) {
+        attributes.add(equalTo(MESSAGING_DESTINATION_NAME, "sns-topic-arn"));
+        attributes.add(equalTo(stringKey("aws.sns.topic.arn"), "sns-topic-arn"));
+      }
     }
 
     if (service.equals("Sqs") && operation.equals("CreateQueue")) {
@@ -530,22 +557,36 @@ public abstract class AbstractAws2ClientTest extends AbstractAws2ClientCoreTest 
                 c ->
                     c.publish(
                         PublishRequest.builder()
-                            .message("somemessage")
-                            .topicArn("somearn")
-                            .build())),
+                            .message("sns-msg-foo")
+                            .targetArn("sns-target-arn")
+                            .build()),
+            "Publish",
+            "POST",
+            snsPublishResponseBody,
+            "d74b8436-ae13-5ab4-a9ff-ce54dfea72a0"),
         Arguments.of(
             (Function<SnsClient, Object>)
                 c ->
-                    c.publish(
-                        PublishRequest.builder()
-                            .message("somemessage")
-                            .targetArn("somearn")
-                            .build())));
+                    c.subscribe(
+                        SubscribeRequest.builder()
+                            .topicArn("sns-topic-arn")
+                            .protocol("email")
+                            .endpoint("test@example.com")
+                            .build()),
+            "Subscribe",
+            "POST",
+            snsSubscribeResponseBody,
+            "0ac9cda2-abcd-11d3-f92b-31fa5e8dbc67"));
   }
 
   @ParameterizedTest
   @MethodSource("provideSnsArguments")
-  void testSnsSendOperationRequestWithBuilder(Function<SnsClient, Object> call) {
+  void testSnsSendOperationRequestWithBuilder(
+      Function<SnsClient, Object> call,
+      String operation,
+      String method,
+      String responseBody,
+      String requestId) {
     SnsClientBuilder builder = SnsClient.builder();
     configureSdkClient(builder);
     SnsClient client =
@@ -555,28 +596,24 @@ public abstract class AbstractAws2ClientTest extends AbstractAws2ClientCoreTest 
             .credentialsProvider(CREDENTIALS_PROVIDER)
             .build();
 
-    String body =
-        "<PublishResponse xmlns=\"https://sns.amazonaws.com/doc/2010-03-31/\">"
-            + "    <PublishResult>"
-            + "        <MessageId>567910cd-659e-55d4-8ccb-5aaf14679dc0</MessageId>"
-            + "    </PublishResult>"
-            + "    <ResponseMetadata>"
-            + "        <RequestId>d74b8436-ae13-5ab4-a9ff-ce54dfea72a0</RequestId>"
-            + "    </ResponseMetadata>"
-            + "</PublishResponse>";
-
-    server.enqueue(HttpResponse.of(HttpStatus.OK, MediaType.PLAIN_TEXT_UTF_8, body));
+    server.enqueue(HttpResponse.of(HttpStatus.OK, MediaType.PLAIN_TEXT_UTF_8, responseBody));
     Object response = call.apply(client);
 
     assertThat(response.getClass().getSimpleName())
         .satisfiesAnyOf(
-            v -> assertThat(v).startsWith("Publish"),
-            v -> assertThat(response).isInstanceOf(ResponseInputStream.class));
-    clientAssertions("Sns", "Publish", "POST", response, "d74b8436-ae13-5ab4-a9ff-ce54dfea72a0");
+            v -> assertThat(response).isInstanceOf(PublishResponse.class),
+            v -> assertThat(response).isInstanceOf(SubscribeResponse.class));
+    clientAssertions("Sns", operation, method, response, requestId);
   }
 
-  @Test
-  void testSnsAsyncSendOperationRequestWithBuilder() {
+  @ParameterizedTest
+  @MethodSource("provideSnsArguments")
+  void testSnsAsyncSendOperationRequestWithBuilder(
+      Function<SnsClient, Object> call,
+      String operation,
+      String method,
+      String responseBody,
+      String requestId) {
     SnsAsyncClientBuilder builder = SnsAsyncClient.builder();
     configureSdkClient(builder);
     SnsAsyncClient client =
@@ -586,20 +623,14 @@ public abstract class AbstractAws2ClientTest extends AbstractAws2ClientCoreTest 
             .credentialsProvider(CREDENTIALS_PROVIDER)
             .build();
 
-    String body =
-        "<PublishResponse xmlns=\"https://sns.amazonaws.com/doc/2010-03-31/\">"
-            + "    <PublishResult>"
-            + "        <MessageId>94f20ce6-13c5-43a0-9a9e-ca52d816e90b</MessageId>"
-            + "    </PublishResult>"
-            + "    <ResponseMetadata>"
-            + "        <RequestId>f187a3c1-376f-11df-8963-01868b7c937a</RequestId>"
-            + "    </ResponseMetadata>"
-            + "</PublishResponse>";
+    server.enqueue(HttpResponse.of(HttpStatus.OK, MediaType.PLAIN_TEXT_UTF_8, responseBody));
+    Object response = call.apply(wrapClient(SnsClient.class, SnsAsyncClient.class, client));
 
-    server.enqueue(HttpResponse.of(HttpStatus.OK, MediaType.PLAIN_TEXT_UTF_8, body));
-    Object response = client.publish(r -> r.message("hello").topicArn("somearn"));
-
-    clientAssertions("Sns", "Publish", "POST", response, "f187a3c1-376f-11df-8963-01868b7c937a");
+    assertThat(response.getClass().getSimpleName())
+        .satisfiesAnyOf(
+            v -> assertThat(response).isInstanceOf(PublishResponse.class),
+            v -> assertThat(response).isInstanceOf(SubscribeResponse.class));
+    clientAssertions("Sns", operation, method, response, requestId);
   }
 
   @Test
@@ -818,10 +849,15 @@ public abstract class AbstractAws2ClientTest extends AbstractAws2ClientCoreTest 
     Object response = call.apply(client);
     assertThat(response.getClass().getSimpleName())
         .satisfiesAnyOf(
-            v -> assertThat(v).startsWith("Describe"),
             v ->
                 assertThat(response)
-                    .isInstanceOf(software.amazon.awssdk.services.sfn.model.SfnResponse.class));
+                    .isInstanceOf(
+                        software.amazon.awssdk.services.sfn.model.DescribeActivityResponse.class),
+            v ->
+                assertThat(response)
+                    .isInstanceOf(
+                        software.amazon.awssdk.services.sfn.model.DescribeStateMachineResponse
+                            .class));
     clientAssertions("Sfn", operation, method, response, requestId);
   }
 
@@ -842,10 +878,15 @@ public abstract class AbstractAws2ClientTest extends AbstractAws2ClientCoreTest 
     Object response = call.apply(wrapClient(SfnClient.class, SfnAsyncClient.class, client));
     assertThat(response.getClass().getSimpleName())
         .satisfiesAnyOf(
-            v -> assertThat(v).startsWith("Describe"),
             v ->
                 assertThat(response)
-                    .isInstanceOf(software.amazon.awssdk.services.sfn.model.SfnResponse.class));
+                    .isInstanceOf(
+                        software.amazon.awssdk.services.sfn.model.DescribeActivityResponse.class),
+            v ->
+                assertThat(response)
+                    .isInstanceOf(
+                        software.amazon.awssdk.services.sfn.model.DescribeStateMachineResponse
+                            .class));
     clientAssertions("Sfn", operation, method, response, requestId);
   }
 
@@ -865,8 +906,8 @@ public abstract class AbstractAws2ClientTest extends AbstractAws2ClientCoreTest 
     Object response =
         client.getSecretValue(GetSecretValueRequest.builder().secretId("MySecretFromCLI").build());
     assertThat(response.getClass().getSimpleName())
-        .satisfiesAnyOf(
-            v -> assertThat(v).startsWith("GetSecretValueResponse"),
+        .satisfies(
+            v -> assertThat(v).isEqualTo("GetSecretValueResponse"),
             v -> assertThat(response).isInstanceOf(GetSecretValueResponse.class));
     clientAssertions("SecretsManager", "GetSecretValue", "POST", response, "UNKNOWN");
   }
@@ -930,11 +971,15 @@ public abstract class AbstractAws2ClientTest extends AbstractAws2ClientCoreTest 
     Object response = call.apply(client);
     assertThat(response.getClass().getSimpleName())
         .satisfiesAnyOf(
-            v -> assertThat(v).endsWith("Response"),
             v ->
                 assertThat(response)
                     .isInstanceOf(
-                        software.amazon.awssdk.services.lambda.model.LambdaResponse.class));
+                        software.amazon.awssdk.services.lambda.model.GetFunctionResponse.class),
+            v ->
+                assertThat(response)
+                    .isInstanceOf(
+                        software.amazon.awssdk.services.lambda.model.GetEventSourceMappingResponse
+                            .class));
     clientAssertions("Lambda", operation, method, response, requestId);
   }
 
@@ -955,11 +1000,15 @@ public abstract class AbstractAws2ClientTest extends AbstractAws2ClientCoreTest 
     Object response = call.apply(wrapClient(LambdaClient.class, LambdaAsyncClient.class, client));
     assertThat(response.getClass().getSimpleName())
         .satisfiesAnyOf(
-            v -> assertThat(v).endsWith("Response"),
             v ->
                 assertThat(response)
                     .isInstanceOf(
-                        software.amazon.awssdk.services.lambda.model.LambdaResponse.class));
+                        software.amazon.awssdk.services.lambda.model.GetFunctionResponse.class),
+            v ->
+                assertThat(response)
+                    .isInstanceOf(
+                        software.amazon.awssdk.services.lambda.model.GetEventSourceMappingResponse
+                            .class));
     clientAssertions("Lambda", operation, method, response, requestId);
   }
 }
