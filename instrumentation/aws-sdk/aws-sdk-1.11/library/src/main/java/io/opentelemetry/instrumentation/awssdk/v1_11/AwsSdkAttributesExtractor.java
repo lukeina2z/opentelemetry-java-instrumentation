@@ -24,6 +24,8 @@ class AwsSdkAttributesExtractor implements AttributesExtractor<Request<?>, Respo
   private static final AttributeKey<String> AWS_REQUEST_ID = stringKey("aws.request_id");
 
   // Copied from AwsIncubatingAttributes
+  private static final AttributeKey<String> AWS_LAMBDA_RESOURCE_MAPPING_ID =
+      stringKey("aws.lambda.resource_mapping.id");
   private static final AttributeKey<String> AWS_SNS_TOPIC_ARN = stringKey("aws.sns.topic.arn");
   private static final AttributeKey<String> AWS_STEP_FUNCTIONS_ACTIVITY_ARN =
       stringKey("aws.step_functions.activity.arn");
@@ -66,6 +68,11 @@ class AwsSdkAttributesExtractor implements AttributesExtractor<Request<?>, Respo
       @Nullable Throwable error) {
     Object awsResp = getAwsResponse(response);
     if (awsResp != null) {
+      setAttribute(
+          attributes,
+          AWS_LAMBDA_RESOURCE_MAPPING_ID,
+          awsResp,
+          RequestAccess::getLambdaResourceMappingId);
       setAttribute(attributes, AWS_SNS_TOPIC_ARN, awsResp, RequestAccess::getSnsTopicArn);
       setAttribute(
           attributes,

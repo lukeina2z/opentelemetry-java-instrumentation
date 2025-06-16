@@ -16,6 +16,8 @@ final class AwsExperimentalAttributes {
   static final AttributeKey<String> AWS_QUEUE_NAME = stringKey("aws.queue.name");
   static final AttributeKey<String> AWS_STREAM_NAME = stringKey("aws.stream.name");
   static final AttributeKey<String> AWS_TABLE_NAME = stringKey("aws.table.name");
+  static final AttributeKey<String> AWS_LAMBDA_ARN = stringKey("aws.lambda.function.arn");
+  static final AttributeKey<String> AWS_LAMBDA_NAME = stringKey("aws.lambda.function.name");
 
   private AwsExperimentalAttributes() {}
 }
