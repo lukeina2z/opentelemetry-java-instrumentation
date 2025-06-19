@@ -46,6 +46,11 @@ class AwsSdkAttributesExtractor implements AttributesExtractor<Request<?>, Respo
   @Override
   public void onStart(AttributesBuilder attributes, Context parentContext, Request<?> request) {
     Object originalRequest = request.getOriginalRequest();
+    setAttribute(
+        attributes,
+        AWS_LAMBDA_RESOURCE_MAPPING_ID,
+        originalRequest,
+        RequestAccess::getLambdaResourceMappingId);
     setAttribute(attributes, AWS_SNS_TOPIC_ARN, originalRequest, RequestAccess::getSnsTopicArn);
     setAttribute(
         attributes,
