@@ -24,6 +24,7 @@ enum AwsSdkRequestType {
   BEDROCK_RUNTIME(),
   LAMBDA(
       request(AWS_LAMBDA_NAME.getKey(), "FunctionName"),
+      request(AttributeKeys.AWS_LAMBDA_RESOURCE_MAPPING_ID.getKey(), "UUID"),
       response(AWS_LAMBDA_ARN.getKey(), "Configuration.FunctionArn"),
       response(AttributeKeys.AWS_LAMBDA_RESOURCE_MAPPING_ID.getKey(), "UUID")),
   SECRETSMANAGER(response(AttributeKeys.AWS_SECRETSMANAGER_SECRET_ARN.getKey(), "ARN")),
