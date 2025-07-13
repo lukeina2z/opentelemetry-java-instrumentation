@@ -1,0 +1,25 @@
+{
+  // Helps the Java extension find sources in this complex project
+  "java.project.sourcePaths": [
+    "smoke-tests/images/security-manager/src",
+    "integration-tests/tracecontext/src"
+  ],
+  "java.compile.nullAnalysis.mode": "automatic"
+}
+
+// {
+//   "java.project.sourcePaths": [
+//     // By default, the extension includes everything.
+//     // To work on a specific instrumentation, for example, aws-sdk-2.2:
+//     // 1. Add all the top-level source folders you need.
+//     "javaagent-bootstrap/src/main/java",
+//     "javaagent-tooling/src/main/java",
+//     "testing-common/src/main/java",
+//     // etc...
+//     // 2. Then, add the specific instrumentation you are working on.
+//     "instrumentation/aws-sdk/aws-sdk-2.2/library/src/main/java",
+//     "instrumentation/aws-sdk/aws-sdk-2.2/javaagent/src/main/java",
+//     "instrumentation/aws-sdk/aws-sdk-2.2/testing/src/main/java"
+//   ]
+// }
+

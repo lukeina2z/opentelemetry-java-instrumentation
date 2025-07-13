@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Launch security-manager smoketest",
+      "request": "launch",
+      "stopOnEntry": false,
+      "mainClass": "io.opentelemetry.smoketest.securitymanager.Main",
+      // "preLaunchTask": "Build security-manager JAR"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Assemble with Gradle",
+      "type": "shell",
+      "windows": {
+        "command": "gradlew.bat"
+      },
+      "command": "./gradlew",
+      "args": ["assemble", "shadowjar"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$gradle"]
+    },
+    {
+      "label": "Build security-manager JAR",
+      "type": "shell",
+      "windows": {
+        "command": "gradlew.bat"
+      },
+      "command": "./gradlew",
+      "args": [":smoke-tests:images:security-manager:jar"],
+      "group": "build",
+      "problemMatcher": ["$gradle"]
+    }
+  ]
+}
