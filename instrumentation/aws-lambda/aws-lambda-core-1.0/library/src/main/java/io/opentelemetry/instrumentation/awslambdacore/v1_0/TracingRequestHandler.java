@@ -66,7 +66,7 @@ public abstract class TracingRequestHandler<I, O> implements RequestHandler<I, O
   @Override
   public final O handleRequest(I input, Context context) {
     AwsLambdaRequest request = AwsLambdaRequest.create(context, input, extractHttpHeaders(input));
-    io.opentelemetry.context.Context parentContext = instrumenter.extract(request);
+    io.opentelemetry.context.Context parentContext = instrumenter.extract(request, context);
 
     if (!instrumenter.shouldStart(parentContext, request)) {
       return doHandleRequest(input, context);
