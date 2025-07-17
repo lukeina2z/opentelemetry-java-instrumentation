@@ -70,7 +70,7 @@ public abstract class TracingRequestStreamHandler implements RequestStreamHandle
       throws IOException {
     ApiGatewayProxyRequest proxyRequest = ApiGatewayProxyRequest.forStream(input);
     AwsLambdaRequest request = createRequest(input, context, proxyRequest);
-    io.opentelemetry.context.Context parentContext = instrumenter.extract(request);
+    io.opentelemetry.context.Context parentContext = instrumenter.extract(request, context);
 
     if (!instrumenter.shouldStart(parentContext, request)) {
       doHandleRequest(proxyRequest.freshStream(), output, context, request);

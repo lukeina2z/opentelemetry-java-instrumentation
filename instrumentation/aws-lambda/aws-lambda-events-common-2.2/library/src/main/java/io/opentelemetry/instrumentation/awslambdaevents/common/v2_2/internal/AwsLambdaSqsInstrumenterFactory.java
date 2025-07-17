@@ -32,7 +32,6 @@ public final class AwsLambdaSqsInstrumenterFactory {
     return Instrumenter.<SQSMessage, Void>builder(
             openTelemetry, instrumentationName, message -> message.getEventSource() + " process")
         .addAttributesExtractor(new SqsMessageAttributesExtractor())
-        .addSpanLinksExtractor(new SqsMessageSpanLinksExtractor())
         .buildInstrumenter(SpanKindExtractor.alwaysConsumer());
   }
 

@@ -103,7 +103,7 @@ val DEPENDENCIES = listOf(
   "io.netty:netty:3.10.6.Final",
   "io.opentelemetry.contrib:opentelemetry-azure-resources:${otelContribVersion}",
   "io.opentelemetry.contrib:opentelemetry-aws-resources:${otelContribVersion}",
-  "io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:${otelContribVersion}",
+  "io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:1.48.0-alpha-adot1",
   "io.opentelemetry.contrib:opentelemetry-gcp-resources:${otelContribVersion}",
   "io.opentelemetry.contrib:opentelemetry-cloudfoundry-resources:${otelContribVersion}",
   "io.opentelemetry.contrib:opentelemetry-baggage-processor:${otelContribVersion}",

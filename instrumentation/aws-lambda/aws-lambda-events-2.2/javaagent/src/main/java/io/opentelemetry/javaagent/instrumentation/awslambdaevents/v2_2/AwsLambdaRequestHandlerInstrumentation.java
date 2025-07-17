@@ -70,7 +70,7 @@ public class AwsLambdaRequestHandlerInstrumentation implements TypeInstrumentati
       }
       input = AwsLambdaRequest.create(context, arg, headers);
       io.opentelemetry.context.Context parentContext =
-          AwsLambdaSingletons.functionInstrumenter().extract(input);
+          AwsLambdaSingletons.functionInstrumenter().extract(input, context);
 
       if (!AwsLambdaSingletons.functionInstrumenter().shouldStart(parentContext, input)) {
         return;

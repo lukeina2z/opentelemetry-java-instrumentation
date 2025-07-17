@@ -68,7 +68,7 @@ public class AwsLambdaRequestHandlerInstrumentation implements TypeInstrumentati
         @Advice.Local("otelContext") io.opentelemetry.context.Context otelContext,
         @Advice.Local("otelScope") Scope otelScope) {
       input = AwsLambdaRequest.create(context, arg, Collections.emptyMap());
-      io.opentelemetry.context.Context parentContext = functionInstrumenter().extract(input);
+      io.opentelemetry.context.Context parentContext = functionInstrumenter().extract(input, context);
 
       if (!functionInstrumenter().shouldStart(parentContext, input)) {
         return;
