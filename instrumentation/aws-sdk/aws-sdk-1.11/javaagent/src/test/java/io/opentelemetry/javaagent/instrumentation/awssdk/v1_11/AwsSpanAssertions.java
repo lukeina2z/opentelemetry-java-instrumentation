@@ -85,11 +85,35 @@ class AwsSpanAssertions {
   }
 
   static SpanDataAssert sns(SpanDataAssert span, String topicArn, String rpcMethod) {
-
-    return span.hasName("SNS." + rpcMethod)
+    SpanDataAssert spanAssert = span.hasName("SNS." + rpcMethod)
         .hasKind(SpanKind.CLIENT)
-        .hasNoParent()
-        .hasAttributesSatisfyingExactly(
+        .hasNoParent();
+
+    // For CreateTopic, the topicArn parameter might be null but aws.sns.topic.arn 
+    // will be set from the response
+    if ("CreateTopic".equals(rpcMethod)) {
+      return spanAssert.hasAttributesSatisfyingExactly(
+            equalTo(stringKey("aws.agent"), "java-aws-sdk"),
+            satisfies(stringKey("aws.endpoint"), v -> v.isInstanceOf(String.class)),
+            satisfies(AWS_REQUEST_ID, v -> v.isInstanceOf(String.class)),
+            equalTo(RPC_METHOD, rpcMethod),
+            equalTo(RPC_SYSTEM, "aws-api"),
+            equalTo(RPC_SERVICE, "AmazonSNS"),
+            equalTo(HTTP_REQUEST_METHOD, "POST"),
+            equalTo(HTTP_RESPONSE_STATUS_CODE, 200),
+            satisfies(URL_FULL, val -> val.startsWith("http://")),
+            satisfies(SERVER_ADDRESS, v -> v.isInstanceOf(String.class)),
+            equalTo(NETWORK_PROTOCOL_VERSION, "1.1"),
+            satisfies(
+                SERVER_PORT,
+                val ->
+                    val.satisfiesAnyOf(
+                        v -> assertThat(v).isNull(),
+                        v -> assertThat(v).isInstanceOf(Number.class))),
+            satisfies(stringKey("aws.sns.topic.arn"), v -> v.isInstanceOf(String.class)));
+    }
+
+    return spanAssert.hasAttributesSatisfyingExactly(
             equalTo(stringKey("aws.agent"), "java-aws-sdk"),
             equalTo(MESSAGING_DESTINATION_NAME, topicArn),
             satisfies(stringKey("aws.endpoint"), v -> v.isInstanceOf(String.class)),
@@ -107,6 +131,7 @@ class AwsSpanAssertions {
                 val ->
                     val.satisfiesAnyOf(
                         v -> assertThat(v).isNull(),
-                        v -> assertThat(v).isInstanceOf(Number.class))));
+                        v -> assertThat(v).isInstanceOf(Number.class))),
+            equalTo(stringKey("aws.sns.topic.arn"), topicArn));
   }
 }

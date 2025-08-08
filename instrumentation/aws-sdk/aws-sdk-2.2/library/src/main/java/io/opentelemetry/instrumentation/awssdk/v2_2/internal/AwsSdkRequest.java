@@ -5,11 +5,20 @@
 
 package io.opentelemetry.instrumentation.awssdk.v2_2.internal;
 
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.BEDROCK;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.BEDROCKAGENTOPERATION;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.BEDROCKAGENTRUNTIMEOPERATION;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.BEDROCKDATASOURCEOPERATION;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.BEDROCKKNOWLEDGEBASEOPERATION;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.BEDROCKRUNTIME;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.DYNAMODB;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.KINESIS;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.LAMBDA;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.S3;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.SECRETSMANAGER;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.SNS;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.SQS;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.STEPFUNCTION;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.FieldMapping.request;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.FieldMapping.response;
 
@@ -34,6 +43,52 @@ enum AwsSdkRequest {
   SnsRequest(SNS, "SnsRequest"),
   SqsRequest(SQS, "SqsRequest"),
   KinesisRequest(KINESIS, "KinesisRequest"),
+
+  BedrockRequest(BEDROCK, "BedrockRequest"),
+  BedrockAgentRuntimeRequest(BEDROCKAGENTRUNTIMEOPERATION, "BedrockAgentRuntimeRequest"),
+  BedrockRuntimeRequest(BEDROCKRUNTIME, "BedrockRuntimeRequest"),
+  // BedrockAgent API based requests. We only support operations that are related to
+  // Agent/DataSources/KnowledgeBases
+  // resources and the request/response context contains the resource ID.
+  BedrockCreateAgentActionGroupRequest(BEDROCKAGENTOPERATION, "CreateAgentActionGroupRequest"),
+  BedrockCreateAgentAliasRequest(BEDROCKAGENTOPERATION, "CreateAgentAliasRequest"),
+  BedrockDeleteAgentActionGroupRequest(BEDROCKAGENTOPERATION, "DeleteAgentActionGroupRequest"),
+  BedrockDeleteAgentAliasRequest(BEDROCKAGENTOPERATION, "DeleteAgentAliasRequest"),
+  BedrockDeleteAgentVersionRequest(BEDROCKAGENTOPERATION, "DeleteAgentVersionRequest"),
+  BedrockGetAgentActionGroupRequest(BEDROCKAGENTOPERATION, "GetAgentActionGroupRequest"),
+  BedrockGetAgentAliasRequest(BEDROCKAGENTOPERATION, "GetAgentAliasRequest"),
+  BedrockGetAgentRequest(BEDROCKAGENTOPERATION, "GetAgentRequest"),
+  BedrockGetAgentVersionRequest(BEDROCKAGENTOPERATION, "GetAgentVersionRequest"),
+  BedrockListAgentActionGroupsRequest(BEDROCKAGENTOPERATION, "ListAgentActionGroupsRequest"),
+  BedrockListAgentAliasesRequest(BEDROCKAGENTOPERATION, "ListAgentAliasesRequest"),
+  BedrockListAgentKnowledgeBasesRequest(BEDROCKAGENTOPERATION, "ListAgentKnowledgeBasesRequest"),
+  BedrocListAgentVersionsRequest(BEDROCKAGENTOPERATION, "ListAgentVersionsRequest"),
+  BedrockPrepareAgentRequest(BEDROCKAGENTOPERATION, "PrepareAgentRequest"),
+  BedrockUpdateAgentActionGroupRequest(BEDROCKAGENTOPERATION, "UpdateAgentActionGroupRequest"),
+  BedrockUpdateAgentAliasRequest(BEDROCKAGENTOPERATION, "UpdateAgentAliasRequest"),
+  BedrockUpdateAgentRequest(BEDROCKAGENTOPERATION, "UpdateAgentRequest"),
+  BedrockBedrockAgentRequest(BEDROCKAGENTOPERATION, "BedrockAgentRequest"),
+  BedrockDeleteDataSourceRequest(BEDROCKDATASOURCEOPERATION, "DeleteDataSourceRequest"),
+  BedrockGetDataSourceRequest(BEDROCKDATASOURCEOPERATION, "GetDataSourceRequest"),
+  BedrockUpdateDataSourceRequest(BEDROCKDATASOURCEOPERATION, "UpdateDataSourceRequest"),
+  BedrocAssociateAgentKnowledgeBaseRequest(
+      BEDROCKKNOWLEDGEBASEOPERATION, "AssociateAgentKnowledgeBaseRequest"),
+  BedrockCreateDataSourceRequest(BEDROCKKNOWLEDGEBASEOPERATION, "CreateDataSourceRequest"),
+  BedrockDeleteKnowledgeBaseRequest(BEDROCKKNOWLEDGEBASEOPERATION, "DeleteKnowledgeBaseRequest"),
+  BedrockDisassociateAgentKnowledgeBaseRequest(
+      BEDROCKKNOWLEDGEBASEOPERATION, "DisassociateAgentKnowledgeBaseRequest"),
+  BedrockGetAgentKnowledgeBaseRequest(
+      BEDROCKKNOWLEDGEBASEOPERATION, "GetAgentKnowledgeBaseRequest"),
+  BedrockGetKnowledgeBaseRequest(BEDROCKKNOWLEDGEBASEOPERATION, "GetKnowledgeBaseRequest"),
+  BedrockListDataSourcesRequest(BEDROCKKNOWLEDGEBASEOPERATION, "ListDataSourcesRequest"),
+  BedrockUpdateAgentKnowledgeBaseRequest(
+      BEDROCKKNOWLEDGEBASEOPERATION, "UpdateAgentKnowledgeBaseRequest"),
+
+  SfnRequest(STEPFUNCTION, "SfnRequest"),
+
+  SecretsManagerRequest(SECRETSMANAGER, "SecretsManagerRequest"),
+
+  LambdaRequest(LAMBDA, "LambdaRequest"),
   // specific requests
   BatchGetItem(
       DYNAMODB,

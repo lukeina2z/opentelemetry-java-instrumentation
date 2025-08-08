@@ -5,6 +5,8 @@
 
 package io.opentelemetry.instrumentation.awssdk.v2_2.internal;
 
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.GEN_AI_SYSTEM;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.BEDROCKRUNTIME;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.DYNAMODB;
 
 import io.opentelemetry.api.common.AttributeKey;
@@ -48,6 +50,7 @@ import software.amazon.awssdk.http.SdkHttpResponse;
  * at any time.
  */
 public final class TracingExecutionInterceptor implements ExecutionInterceptor {
+  private static final String GEN_AI_SYSTEM_BEDROCK = "aws.bedrock";
 
   // copied from DbIncubatingAttributes
   private static final AttributeKey<String> DB_OPERATION = AttributeKey.stringKey("db.operation");
@@ -341,6 +344,10 @@ public final class TracingExecutionInterceptor implements ExecutionInterceptor {
           span.setAttribute(DB_OPERATION, operation);
         }
       }
+    }
+
+    if (awsSdkRequest.type() == BEDROCKRUNTIME) {
+      span.setAttribute(GEN_AI_SYSTEM, GEN_AI_SYSTEM_BEDROCK);
     }
   }
 
