@@ -5,6 +5,8 @@
 
 package io.opentelemetry.instrumentation.awssdk.v2_2.internal;
 
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsExperimentalAttributes.GEN_AI_SYSTEM;
+import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.BEDROCKRUNTIME;
 import static io.opentelemetry.instrumentation.awssdk.v2_2.internal.AwsSdkRequestType.DYNAMODB;
 
 import io.opentelemetry.api.common.AttributeKey;
@@ -47,6 +49,7 @@ import software.amazon.awssdk.http.SdkHttpResponse;
  * at any time.
  */
 public final class TracingExecutionInterceptor implements ExecutionInterceptor {
+  private static final String GEN_AI_SYSTEM_BEDROCK = "aws.bedrock";
 
   // copied from AwsIncubatingAttributes
   private static final AttributeKey<String> AWS_REQUEST_ID =
@@ -355,6 +358,35 @@ public final class TracingExecutionInterceptor implements ExecutionInterceptor {
     return responseBody;
   }
 
+<<<<<<< HEAD
+=======
+  private void populateRequestAttributes(
+      Span span,
+      AwsSdkRequest awsSdkRequest,
+      SdkRequest sdkRequest,
+      ExecutionAttributes attributes) {
+
+    fieldMapper.mapToAttributes(sdkRequest, awsSdkRequest, span);
+
+    if (awsSdkRequest.type() == DYNAMODB) {
+      span.setAttribute(DB_SYSTEM, DB_SYSTEM_DYNAMODB);
+      String operation = attributes.getAttribute(SdkExecutionAttribute.OPERATION_NAME);
+      if (operation != null) {
+        if (SemconvStability.emitStableDatabaseSemconv()) {
+          span.setAttribute(DB_OPERATION_NAME, operation);
+        }
+        if (SemconvStability.emitOldDatabaseSemconv()) {
+          span.setAttribute(DB_OPERATION, operation);
+        }
+      }
+    }
+
+    if (awsSdkRequest.type() == BEDROCKRUNTIME) {
+      span.setAttribute(GEN_AI_SYSTEM, GEN_AI_SYSTEM_BEDROCK);
+    }
+  }
+
+>>>>>>> 75cccac7ad (applying first patch in the v2.11 branch.)
   @Override
   public void afterExecution(
       Context.AfterExecution context, ExecutionAttributes executionAttributes) {
