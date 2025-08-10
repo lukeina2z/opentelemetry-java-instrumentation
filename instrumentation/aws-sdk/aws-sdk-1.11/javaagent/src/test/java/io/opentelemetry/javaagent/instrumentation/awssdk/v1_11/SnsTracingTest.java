@@ -89,6 +89,7 @@ class SnsTracingTest {
                             equalTo(RPC_METHOD, "ReceiveMessage"),
                             equalTo(RPC_SYSTEM, "aws-api"),
                             equalTo(RPC_SERVICE, "AmazonSQS"),
+                            equalTo(stringKey("aws.auth.account.access_key"), "test"),
                             equalTo(HTTP_REQUEST_METHOD, "POST"),
                             equalTo(HTTP_RESPONSE_STATUS_CODE, 200),
                             satisfies(URL_FULL, val -> val.startsWith("http://")),
