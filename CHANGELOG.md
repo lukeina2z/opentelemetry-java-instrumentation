@@ -1,6 +1,5 @@
 # Changelog
 
-<<<<<<< HEAD
 ## Version 2.18.1 (2025-07-21)
 
 ### 🛠️ Bug fixes
@@ -433,8 +432,6 @@
 - Fix appender install for async Logback appenders
   ([#13047](https://github.com/open-telemetry/opentelemetry-java-instrumentation/pull/13047))
 
-=======
->>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
 ## Version 2.11.0 (2024-12-23)
 
 ### Migration notes

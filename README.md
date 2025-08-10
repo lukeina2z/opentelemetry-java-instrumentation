@@ -33,11 +33,7 @@ If you are looking for documentation on using those.
 ## Getting Started
 
 Download
-<<<<<<< HEAD
 the [latest version](https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.18.1/opentelemetry-javaagent.jar).
-=======
-the [latest version](https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.11.0/opentelemetry-javaagent.jar).
->>>>>>> 392b954d0e ([R:] applied patch from adot java repo.)
 
 This package includes the instrumentation agent as well as
 instrumentations for all supported libraries and all available data exporters.
