@@ -319,6 +319,11 @@ tasks {
   withType<GenerateModuleMetadata>().configureEach {
     enabled = false
   }
+
+  // spdx sbom generation fails on windows with file uris
+  withType<SpdxSbomTask>().configureEach {
+    onlyIf { !System.getProperty("os.name").lowercase().contains("windows") }
+  }
 }
 
 // Don't publish non-shadowed jar (shadowJar is in shadowRuntimeElements)
@@ -359,9 +364,12 @@ project.afterEvaluate {
     mustRunAfter(tasks.withType<SpdxSbomTask>())
   }
   tasks.withType<PublishToMavenLocal>().configureEach {
-    this.publication.artifact("${layout.buildDirectory.get()}/spdx/opentelemetry-javaagent.spdx.json") {
-      classifier = "spdx"
-      extension = "json"
+    // spdx sbom generation is disabled on windows
+    if (!System.getProperty("os.name").lowercase().contains("windows")) {
+      this.publication.artifact("${layout.buildDirectory.get()}/spdx/opentelemetry-javaagent.spdx.json") {
+        classifier = "spdx"
+        extension = "json"
+      }
     }
   }
 }

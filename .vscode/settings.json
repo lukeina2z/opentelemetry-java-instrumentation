@@ -4,7 +4,8 @@
     "smoke-tests/images/security-manager/src",
     "integration-tests/tracecontext/src"
   ],
-  "java.compile.nullAnalysis.mode": "automatic"
+  "java.compile.nullAnalysis.mode": "automatic",
+  "java.configuration.updateBuildConfiguration": "interactive"
 }
 
 // {
