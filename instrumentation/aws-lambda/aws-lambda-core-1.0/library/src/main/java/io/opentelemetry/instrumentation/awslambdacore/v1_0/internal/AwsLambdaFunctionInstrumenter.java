@@ -12,7 +12,6 @@ import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter;
 import io.opentelemetry.instrumentation.api.internal.ContextPropagationDebug;
 import io.opentelemetry.instrumentation.awslambdacore.v1_0.AwsLambdaRequest;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import javax.annotation.Nullable;
 
@@ -47,8 +46,8 @@ public class AwsLambdaFunctionInstrumenter {
     instrumenter.end(context, input, response, error);
   }
 
-  public Context extract(AwsLambdaRequest input) {
-    ContextPropagationDebug.debugContextLeakIfEnabled();
+  public Context extract(
+      AwsLambdaRequest input, com.amazonaws.services.lambda.runtime.Context lambdaContext) {
     // Look in both the http headers and the custom client context
     Map<String, String> headers = input.getHeaders();
     if (input.getAwsContext() != null && input.getAwsContext().getClientContext() != null) {
@@ -59,23 +58,15 @@ public class AwsLambdaFunctionInstrumenter {
       }
     }
 
+    return ParentContextExtractor.extract(headers, this, lambdaContext);
+  }
+
+  public Context extract(Map<String, String> headers, TextMapGetter<Map<String, String>> getter) {
+    ContextPropagationDebug.debugContextLeakIfEnabled();
+
     return openTelemetry
         .getPropagators()
         .getTextMapPropagator()
-        .extract(Context.root(), headers, MapGetter.INSTANCE);
-  }
-
-  private enum MapGetter implements TextMapGetter<Map<String, String>> {
-    INSTANCE;
-
-    @Override
-    public Iterable<String> keys(Map<String, String> map) {
-      return map.keySet();
-    }
-
-    @Override
-    public String get(Map<String, String> map, String s) {
-      return map.get(s.toLowerCase(Locale.ROOT));
-    }
+        .extract(Context.root(), headers, getter);
   }
 }

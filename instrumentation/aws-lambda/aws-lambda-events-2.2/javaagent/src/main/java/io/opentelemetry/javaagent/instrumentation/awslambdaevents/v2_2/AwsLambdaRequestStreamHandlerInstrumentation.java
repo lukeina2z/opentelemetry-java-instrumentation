@@ -62,7 +62,7 @@ public class AwsLambdaRequestStreamHandlerInstrumentation implements TypeInstrum
       Map<String, String> headers = Collections.emptyMap();
       otelInput = AwsLambdaRequest.create(context, input, headers);
       io.opentelemetry.context.Context parentContext =
-          AwsLambdaInstrumentationHelper.functionInstrumenter().extract(otelInput);
+          AwsLambdaInstrumentationHelper.functionInstrumenter().extract(otelInput, context);
 
       if (!AwsLambdaInstrumentationHelper.functionInstrumenter()
           .shouldStart(parentContext, otelInput)) {

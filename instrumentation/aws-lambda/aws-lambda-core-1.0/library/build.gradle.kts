@@ -5,11 +5,12 @@ plugins {
 dependencies {
   compileOnly("io.opentelemetry:opentelemetry-sdk")
   compileOnly("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure")
+  compileOnly(project(":muzzle"))
 
   compileOnly("com.google.auto.value:auto-value-annotations")
   annotationProcessor("com.google.auto.value:auto-value")
 
-  library("com.amazonaws:aws-lambda-java-core:1.0.0")
+  library("com.amazonaws:aws-lambda-java-core:1.4.0")
 
   // We do lightweight parsing of JSON to extract HTTP headers from requests for propagation.
   // This will be commonly needed even for users that don't use events, but luckily it's not too big.
@@ -26,6 +27,7 @@ dependencies {
 
   testImplementation(project(":instrumentation:aws-lambda:aws-lambda-core-1.0:testing"))
   testImplementation("uk.org.webcompere:system-stubs-jupiter")
+  testImplementation("com.google.guava:guava")
 }
 
 tasks.withType<Test>().configureEach {

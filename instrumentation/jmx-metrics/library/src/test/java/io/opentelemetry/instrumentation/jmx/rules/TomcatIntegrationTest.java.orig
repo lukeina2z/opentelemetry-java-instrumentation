@@ -23,8 +23,8 @@ public class TomcatIntegrationTest extends TargetSystemTest {
 
   @ParameterizedTest
   @CsvSource({
-    // TODO: Remove this patch after we no longer depend on 2.18.1 of opentelemetry-java-instrumentation.
     "tomcat:10.0, https://tomcat.apache.org/tomcat-10.0-doc/appdev/sample/sample.war",
+    "tomcat:9.0, https://tomcat.apache.org/tomcat-9.0-doc/appdev/sample/sample.war"
   })
   void testCollectedMetrics(String dockerImageName, String sampleWebApplicationUrl)
       throws Exception {

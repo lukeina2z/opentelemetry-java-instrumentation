@@ -69,7 +69,7 @@ public class AwsLambdaRequestStreamHandlerInstrumentation implements TypeInstrum
         @Advice.Local("otelScope") Scope otelScope) {
 
       otelInput = AwsLambdaRequest.create(context, input, Collections.emptyMap());
-      io.opentelemetry.context.Context parentContext = functionInstrumenter().extract(otelInput);
+      io.opentelemetry.context.Context parentContext = functionInstrumenter().extract(otelInput, context);
 
       if (!functionInstrumenter().shouldStart(parentContext, otelInput)) {
         return;

@@ -37,7 +37,7 @@ class InstrumenterExtractionTest {
 
     AwsLambdaRequest input = AwsLambdaRequest.create(awsContext, new HashMap<>(), new HashMap<>());
 
-    Context extracted = instr.extract(input);
+    Context extracted = instr.extract(input, awsContext);
     SpanContext spanContext = Span.fromContext(extracted).getSpanContext();
     assertThat(spanContext.getTraceId()).isEqualTo("4bf92f3577b34da6a3ce929d0e0e4736");
     assertThat(spanContext.getSpanId()).isEqualTo("00f067aa0ba902b7");
